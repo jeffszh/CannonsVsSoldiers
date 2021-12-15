@@ -4,7 +4,7 @@ import javafx.fxml.FXMLLoader
 import javafx.scene.layout.BorderPane
 import tornadofx.*
 
-class MainWnd : View("三炮十五兵") {
+class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
 	override val root: BorderPane
 	private val j: MainWndJ
