@@ -7,6 +7,7 @@ import javafx.scene.input.ClipboardContent
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.BorderPane
 import tornadofx.*
+import kotlin.math.abs
 
 class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
@@ -26,13 +27,17 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		chessBoardCanvas = Canvas(300.0, 200.0)
 		j.centerPane.add(chessBoardCanvas)
 
-		j.centerPane.setOnDragDetected {
+		var mx = 0.0
+		var my = 0.0
+		j.centerPane.setOnDragDetected { e ->
 			val drg = j.centerPane.startDragAndDrop(TransferMode.MOVE)
 			drg.setDragView(img, 24.0, 24.0)
 			// 坑！必须设置内容，而且内容不为空，才能真正发起拖拽，否则没反应！
 			drg.setContent(ClipboardContent().apply {
 				putString("AbCd")
 			})
+			mx = e.x
+			my = e.y
 			println("start drag")
 		}
 		j.centerPane.setOnDragEntered { e ->
@@ -41,6 +46,18 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		j.centerPane.setOnDragOver { e ->
 			println("drag: ${e.x}, ${e.y}")
 			chessBoardCanvas.relocate(e.x, e.y)
+			if (abs(mx - e.x) > 100 || abs(my - e.y) > 100) {
+				e.acceptTransferModes(TransferMode.MOVE)
+			}
+		}
+		j.centerPane.setOnDragDropped { e ->
+			e.isDropCompleted = true
+			e.consume()
+			println("drop! ${e.x}, ${e.y}")
+		}
+		j.centerPane.setOnDragDone { e ->
+			e.consume()
+			println("done! ${e.x}, ${e.y}")
 		}
 	}
 
