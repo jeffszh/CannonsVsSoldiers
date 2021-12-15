@@ -14,7 +14,7 @@
 		</HBox>
 	</top>
 	<center>
-		<HBox fx:id="centerPane" alignment="CENTER" BorderPane.alignment="CENTER"/>
+		<Pane fx:id="centerPane" BorderPane.alignment="CENTER"/>
 	</center>
 	<bottom>
 		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
