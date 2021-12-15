@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="400.0" prefWidth="600.0"
+			style="-fx-font-family: 'Courier New'; -fx-font-size: 20;"
+			xmlns="http://javafx.com/javafx/11.0.1"
+			xmlns:fx="http://javafx.com/fxml/1" fx:controller="cn.jeff.game.c3s15.MainWndJ">
+	<top>
+		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
+	</top>
+</BorderPane>
