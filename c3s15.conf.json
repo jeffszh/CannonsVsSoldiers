@@ -1,3 +1,5 @@
 {
-  "mainTitle": "三炮十五兵（带AI）"
+  "mainTitle": "三炮十五兵（带AI）",
+  "cannonText": "炮",
+  "soldierText": "兵"
 }

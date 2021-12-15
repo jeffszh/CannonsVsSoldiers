@@ -1,11 +1,14 @@
 package cn.jeff.game.c3s15
 
+import cn.jeff.game.c3s15.board.ChessBoardCanvas
 import javafx.fxml.FXMLLoader
 import javafx.scene.canvas.Canvas
 import javafx.scene.image.Image
+import javafx.scene.image.WritableImage
 import javafx.scene.input.ClipboardContent
 import javafx.scene.input.TransferMode
 import javafx.scene.layout.BorderPane
+import javafx.scene.text.Font
 import tornadofx.*
 import kotlin.math.abs
 
@@ -13,19 +16,29 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
 	override val root: BorderPane
 	private val j: MainWndJ
-	private val chessBoardCanvas: Canvas
+	private val chessBoardCanvas: ChessBoardCanvas
 
 	init {
 		primaryStage.isResizable = true
 
 		val loader = FXMLLoader()
 		root = loader.load(javaClass.getResourceAsStream("/cn/jeff/game/c3s15/MainWnd.fxml"))
-		val img = Image(javaClass.getResourceAsStream("/image/block.png"))
+		// val img = Image(javaClass.getResourceAsStream("/image/block.png"))
+		val img = Canvas(80.0, 80.0).apply {
+			val gc = graphicsContext2D
+			isMouseTransparent = true
+			gc.clearRect(0.0, 0.0, 80.0, 80.0)
+			gc.fill = c(160, 160, 2)
+			gc.fillRoundRect(2.0, 2.0, 76.0, 76.0, 82.0, 82.0)
+			gc.strokeRoundRect(2.0, 2.0, 76.0, 76.0, 82.0, 82.0)
+			gc.font = Font.font(50.0)
+			gc.strokeText(GlobalVars.appConf.cannonText, 20.0, 60.0)
+		}.snapshot(null, WritableImage(80, 80))
 		j = loader.getController()
 		j.k = this
-
-		chessBoardCanvas = Canvas(300.0, 200.0)
-		j.centerPane.add(chessBoardCanvas)
+		chessBoardCanvas = j.chessBoardCanvas
+		chessBoardCanvas.width = 300.0
+		chessBoardCanvas.height = 200.0
 
 		var mx = 0.0
 		var my = 0.0
