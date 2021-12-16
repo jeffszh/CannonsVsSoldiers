@@ -1,9 +1,8 @@
 package cn.jeff.game.c3s15
 
-import cn.jeff.game.c3s15.board.ChessBoardCanvas
+import cn.jeff.game.c3s15.board.Chess
 import javafx.fxml.FXMLLoader
 import javafx.scene.canvas.Canvas
-import javafx.scene.image.Image
 import javafx.scene.image.WritableImage
 import javafx.scene.input.ClipboardContent
 import javafx.scene.input.TransferMode
@@ -16,7 +15,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
 	override val root: BorderPane
 	private val j: MainWndJ
-	private val chessBoardCanvas: ChessBoardCanvas
+	private val chessBoardCanvas: Chess
 
 	init {
 		primaryStage.isResizable = true
@@ -79,8 +78,8 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		gc.fill = c(0, 160, 255)
 		gc.fillRect(0.0, 0.0, chessBoardCanvas.width, chessBoardCanvas.height)
 		gc.fill = c(255, 128, 0)
-		gc.fillRoundRect(80.0, 60.0, 120.0, 90.0, 8.0, 8.0)
-		gc.strokeRoundRect(80.0, 60.0, 120.0, 90.0, 8.0, 8.0)
+		gc.fillRoundRect(-80.0, 60.0, 120.0, 90.0, 8.0, 8.0)
+		gc.strokeRoundRect(-80.0, 60.0, 120.0, 90.0, 8.0, 8.0)
 //		j.centerPane.clear()
 //		j.centerPane.children.add(canvas)
 //		val pane = Pane()

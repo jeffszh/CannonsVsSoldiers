@@ -15,9 +15,7 @@
 		</HBox>
 	</top>
 	<center>
-		<Pane fx:id="centerPane" BorderPane.alignment="CENTER">
-			<ChessBoardCanvas fx:id="chessBoardCanvas" height="60.0" width="80.0"/>
-		</Pane>
+		<ChessBoard fx:id="centerPane" BorderPane.alignment="CENTER"/>
 	</center>
 	<bottom>
 		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>

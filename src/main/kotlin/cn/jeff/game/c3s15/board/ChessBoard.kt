@@ -1,4 +1,6 @@
 package cn.jeff.game.c3s15.board
 
-class ChessBoard {
+import javafx.scene.layout.Pane
+
+class ChessBoard : Pane() {
 }
