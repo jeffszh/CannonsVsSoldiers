@@ -24,10 +24,16 @@ class ChessBoard : Pane() {
 	private val cellSizeProperty = SimpleDoubleProperty(0.0)
 
 	private val backgroundCanvas = Canvas()
+	private val chessCells = List(25) {
+		ChessCell()
+	}
 	private var isSizeChanged = false
 
 	init {
 		add(backgroundCanvas)
+		chessCells.forEach {
+			add(it)
+		}
 		cellSizeProperty.onChange { cellSize ->
 			repaintBackground(cellSize)
 		}
@@ -46,6 +52,7 @@ class ChessBoard : Pane() {
 			if (isSizeChanged) {
 				println("新大小 = $width x $height")
 				cellSizeProperty.value = floor((min(width, height) - borderPadding * 2) / 20) * 4
+				rearrangeCells()
 				isSizeChanged = false
 			}
 		}
@@ -74,6 +81,18 @@ class ChessBoard : Pane() {
 					strokeLine(d, borderPadding, d, height - borderPadding)
 				}
 			}
+		}
+	}
+
+	private fun rearrangeCells() {
+		chessCells.forEachIndexed { index, chessCell ->
+			val iX = index % 5
+			val iY = index / 5
+			chessCell.layoutX = borderPadding + iX * cellSizeProperty.value +
+					backgroundCanvas.layoutX
+			chessCell.layoutY = borderPadding + iY * cellSizeProperty.value +
+					backgroundCanvas.layoutY
+			chessCell.cellSizeProperty.value = cellSizeProperty.value
 		}
 	}
 
