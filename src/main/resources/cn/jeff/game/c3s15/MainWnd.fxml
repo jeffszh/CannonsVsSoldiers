@@ -15,7 +15,9 @@
 		</HBox>
 	</top>
 	<center>
-		<ChessBoard fx:id="chessBoard" BorderPane.alignment="CENTER"/>
+		<ChessBoard fx:id="chessBoard" minHeight="300.0" minWidth="400.0"
+					style="-fx-background-image: url('/image/wood.jpg');"
+					BorderPane.alignment="CENTER"/>
 	</center>
 	<bottom>
 		<HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER"/>
