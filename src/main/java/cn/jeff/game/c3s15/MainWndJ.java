@@ -1,13 +1,11 @@
 package cn.jeff.game.c3s15;
 
-import cn.jeff.game.c3s15.board.Chess;
-import javafx.scene.layout.Pane;
+import cn.jeff.game.c3s15.board.ChessBoard;
 
 public class MainWndJ {
 
 	MainWnd k;
-	public Pane centerPane;
-	public Chess chessBoardCanvas;
+	public ChessBoard chessBoard;
 
 	public void btn01Click() {
 		k.btn01Click();

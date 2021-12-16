@@ -1,6 +1,6 @@
 package cn.jeff.game.c3s15
 
-import cn.jeff.game.c3s15.board.Chess
+import cn.jeff.game.c3s15.board.ChessCell
 import javafx.fxml.FXMLLoader
 import javafx.scene.canvas.Canvas
 import javafx.scene.image.WritableImage
@@ -15,7 +15,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
 	override val root: BorderPane
 	private val j: MainWndJ
-	private val chessBoardCanvas: Chess
+	private val chessBoardCanvas: ChessCell
 
 	init {
 		primaryStage.isResizable = true
