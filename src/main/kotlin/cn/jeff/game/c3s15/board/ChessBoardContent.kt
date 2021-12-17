@@ -1,5 +1,6 @@
 package cn.jeff.game.c3s15.board
 
+import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.*
 
@@ -14,9 +15,9 @@ import tornadofx.*
 class ChessBoardContent {
 
 	private val chessList = List(25) { Chess.EMPTY }.toObservable()
-	private val lastMove = SimpleObjectProperty<Move>(null)
+	val lastMove = SimpleObjectProperty<Move>(null)
 
-	class Move(val fromX: Int, val fromY: Int, toX: Int, toY: Int)
+	class Move(val fromX: Int, val fromY: Int, val toX: Int, val toY: Int)
 
 	/**
 	 * 设置成开局局面。
@@ -59,6 +60,15 @@ class ChessBoardContent {
 				chessCell.chessProperty.value = chessList[index]
 			}
 		}
+	}
+
+	/**
+	 * 关联到界面上的“上一步棋”
+	 *
+	 * @param uiLastMove 在界面上显示的“上一步棋”
+	 */
+	fun attachToLastMove(uiLastMove: ObjectProperty<Move>) {
+		lastMove.bindBidirectional(uiLastMove)
 	}
 
 	private fun compressToInt64(chessList: List<Chess>): Long {

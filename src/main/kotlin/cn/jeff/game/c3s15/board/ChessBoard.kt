@@ -1,6 +1,8 @@
 package cn.jeff.game.c3s15.board
 
+import cn.jeff.game.c3s15.brain.calcArrowPolygonPoints
 import javafx.beans.property.SimpleDoubleProperty
+import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.canvas.Canvas
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
@@ -29,16 +31,21 @@ class ChessBoard : Pane() {
 	}
 	private var isSizeChanged = false
 
+	private val lastMoveIndicator = Canvas()
+	private val lastMove = SimpleObjectProperty<ChessBoardContent.Move>(null)
+
 	/** 棋盘的内容 */
-	private val content = ChessBoardContent()
+	val content = ChessBoardContent()
 
 	init {
 		add(backgroundCanvas)
 		chessCells.forEach {
 			add(it)
 		}
+		add(lastMoveIndicator)
 		cellSizeProperty.onChange { cellSize ->
 			repaintBackground(cellSize)
+			updateLastMoveIndicator()
 		}
 		widthProperty().onChange {
 			sizeChanged()
@@ -46,8 +53,12 @@ class ChessBoard : Pane() {
 		heightProperty().onChange {
 			sizeChanged()
 		}
+		lastMove.onChange {
+			updateLastMoveIndicator()
+		}
 
 		content.attachToChessCells(chessCells)
+		content.attachToLastMove(lastMove)
 		content.setInitialContent()
 	}
 
@@ -99,6 +110,39 @@ class ChessBoard : Pane() {
 			chessCell.layoutY = borderPadding + iY * cellSizeProperty.value +
 					backgroundCanvas.layoutY
 			chessCell.cellSizeProperty.value = cellSizeProperty.value
+		}
+	}
+
+	private fun updateLastMoveIndicator() {
+		lastMoveIndicator.apply {
+			width = backgroundCanvas.width
+			height = backgroundCanvas.height
+			layoutX = backgroundCanvas.layoutX
+			layoutY = backgroundCanvas.layoutY
+			graphicsContext2D.apply {
+				clearRect(0.0, 0.0, width, height)
+				val cellSize = cellSizeProperty.value
+				val lastMoveValue = lastMove.value
+				if (lastMoveValue != null) {
+					val (fromX, fromY, toX, toY) = with(lastMoveValue) {
+						listOf(fromX, fromY, toX, toY)
+					}.map { intVal ->
+						intVal * cellSize + borderPadding + cellSize / 2.0
+					}
+					val polygonPoints = calcArrowPolygonPoints(
+						fromX, fromY, toX, toY,
+						cellSize * .15, cellSize * .25
+					)
+					val xArray = polygonPoints.map { it.x }.toDoubleArray()
+					val yArray = polygonPoints.map { it.y }.toDoubleArray()
+					val nPoints = polygonPoints.count()
+					fill = c(255, 160, 0, .65)
+					stroke = c(80, 250, 0, .65)
+					lineWidth = 3.0
+					fillPolygon(xArray, yArray, nPoints)
+					strokePolygon(xArray, yArray, nPoints)
+				}
+			}
 		}
 	}
 
