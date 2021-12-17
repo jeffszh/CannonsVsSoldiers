@@ -63,20 +63,22 @@ class ChessCell : Canvas() {
 		fontRefSize.value = width * .75 - borderPadding - 4.0
 		graphicsContext2D.apply {
 			clearRect(0.0, 0.0, width, height)
-			stroke = chessProperty.value.color
-			lineWidth = 3.0
-			fill = Color.WHITE
-			val internalWidth = width - 2 * borderPadding
-			fillOval(borderPadding, borderPadding, internalWidth, internalWidth)
-			strokeOval(borderPadding, borderPadding, internalWidth, internalWidth)
-			font = Font(fontSize)
-			fill = stroke
-			fillText(
-				chessProperty.value.text,
-				(cellSizeProperty.value - fontRefSize.value) / 2,
-				cellSizeProperty.value - (cellSizeProperty.value - fontRefSize.value) / 2 -
-						fontSize * .16
-			)
+			if (chessProperty.value.text.isNotBlank()) {
+				stroke = chessProperty.value.color
+				lineWidth = 3.0
+				fill = Color.WHITE
+				val internalWidth = width - 2 * borderPadding
+				fillOval(borderPadding, borderPadding, internalWidth, internalWidth)
+				strokeOval(borderPadding, borderPadding, internalWidth, internalWidth)
+				font = Font(fontSize)
+				fill = stroke
+				fillText(
+					chessProperty.value.text,
+					(cellSizeProperty.value - fontRefSize.value) / 2,
+					cellSizeProperty.value - (cellSizeProperty.value - fontRefSize.value) / 2 -
+							fontSize * .16
+				)
+			}
 		}
 	}
 

@@ -29,6 +29,9 @@ class ChessBoard : Pane() {
 	}
 	private var isSizeChanged = false
 
+	/** 棋盘的内容 */
+	private val content = ChessBoardContent()
+
 	init {
 		add(backgroundCanvas)
 		chessCells.forEach {
@@ -43,6 +46,9 @@ class ChessBoard : Pane() {
 		heightProperty().onChange {
 			sizeChanged()
 		}
+
+		content.attachToChessCells(chessCells)
+		content.setInitialContent()
 	}
 
 	private fun sizeChanged() {
