@@ -4,6 +4,7 @@ import cn.jeff.game.c3s15.brain.calcArrowPolygonPoints
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.canvas.Canvas
+import javafx.scene.input.TransferMode
 import javafx.scene.layout.Pane
 import javafx.scene.paint.Color
 import tornadofx.*
@@ -60,6 +61,8 @@ class ChessBoard : Pane() {
 		content.attachToChessCells(chessCells)
 		content.attachToLastMove(lastMove)
 		content.setInitialContent()
+
+		setupDragDrop()
 	}
 
 	private fun sizeChanged() {
@@ -145,5 +148,37 @@ class ChessBoard : Pane() {
 			}
 		}
 	}
+
+	private fun setupDragDrop() {
+		setOnDragDetected { e ->
+			val (x, y) = mouseXyToChessBoardXy(e.x, e.y)
+			val chess = content[x, y]
+			println("${e.x},${e.y} --> $x,$y  $chess")
+			if (if (content.isCannonsTurn) {
+					chess == Chess.CANNON
+				} else {
+					chess == Chess.SOLDIER
+				}
+			) {
+				startDragAndDrop(TransferMode.MOVE).setContent {
+					putString(chess?.text)
+				}
+				println("开始拖拽--------------------------------------")
+			}
+		}
+		setOnDragEntered {
+		}
+		setOnDragOver {
+		}
+		setOnDragDropped {
+		}
+		setOnDragDone {
+		}
+	}
+
+	private fun mouseXyToChessBoardXy(mX: Double, mY: Double) = listOf(
+		floor((mX - backgroundCanvas.layoutX - borderPadding) / cellSizeProperty.value).toInt(),
+		floor((mY - backgroundCanvas.layoutY - borderPadding) / cellSizeProperty.value).toInt()
+	)
 
 }
