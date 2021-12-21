@@ -1,5 +1,6 @@
 package cn.jeff.game.c3s15.board
 
+import cn.jeff.game.c3s15.GlobalVars
 import cn.jeff.game.c3s15.brain.calcArrowPolygonPoints
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -153,6 +154,9 @@ class ChessBoard : Pane() {
 		var startDragX = -1
 		var startDragY = -1
 		setOnDragDetected { e ->
+			if (content.gameOver) {
+				return@setOnDragDetected
+			}
 			val (x, y) = mouseXyToChessBoardXy(e.x, e.y)
 			val chess = content[x, y]
 			println("${e.x},${e.y} --> $x,$y  $chess")
@@ -190,6 +194,7 @@ class ChessBoard : Pane() {
 			e.isDropCompleted = true
 			e.consume()
 			rearrangeCells()
+			showDialogIfGameOver()
 		}
 		setOnDragDone { e ->
 			e.consume()
@@ -201,5 +206,15 @@ class ChessBoard : Pane() {
 		floor((mX - backgroundCanvas.layoutX - borderPadding) / cellSizeProperty.value).toInt(),
 		floor((mY - backgroundCanvas.layoutY - borderPadding) / cellSizeProperty.value).toInt()
 	)
+
+	private fun showDialogIfGameOver() {
+		if (content.gameOver) {
+			val winSideText = if (content.isCannonsWin)
+				GlobalVars.appConf.cannonText
+			else
+				GlobalVars.appConf.soldierText
+			information("【$winSideText】获胜！")
+		}
+	}
 
 }

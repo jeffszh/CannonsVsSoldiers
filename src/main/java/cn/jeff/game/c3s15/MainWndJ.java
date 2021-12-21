@@ -7,8 +7,8 @@ public class MainWndJ {
 	MainWnd k;
 	public ChessBoard chessBoard;
 
-	public void btn01Click() {
-		k.btn01Click();
+	public void btnRestartClick() {
+		k.btnRestartClick();
 	}
 
 	public void btn02Click() {

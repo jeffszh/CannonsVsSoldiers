@@ -16,10 +16,12 @@ import tornadofx.*
 class ChessBoardContent {
 
 	private val chessList = List(25) { Chess.EMPTY }.toObservable()
-	val lastMove = SimpleObjectProperty<Move>(null)
+	private val lastMove = SimpleObjectProperty<Move>(null)
 	private val moveCountProperty = SimpleIntegerProperty(0)
 	private var moveCount by moveCountProperty
 	val isCannonsTurn get() = (moveCount % 2) == 0
+	var gameOver = false
+	val isCannonsWin get() = gameOver && !isCannonsTurn
 
 	operator fun get(x: Int, y: Int) = if (x in 0..4 && y in 0..4) chessList[x + y * 5] else null
 
@@ -48,6 +50,8 @@ class ChessBoardContent {
 		}
 		chessList.setAll(content)
 		lastMove.value = null
+		moveCount = 0
+		gameOver = false
 
 		// 试验
 		val compress = compressToInt64(chessList)
@@ -135,7 +139,35 @@ class ChessBoardContent {
 			this[move.fromX, move.fromY] = Chess.EMPTY
 			lastMove.value = move
 			moveCount++
+			gameOver = livingSoldierCount() == 0 || cannonBreathCount() == 0
 		}
 	}
+
+	/**
+	 * 剩余的【兵】的数量
+	 */
+	private fun livingSoldierCount() =
+		chessList.count { it == Chess.SOLDIER }
+
+	/**
+	 * 【炮】的“气”的数量
+	 */
+	private fun cannonBreathCount(): Int =
+		// 找出所有空位的坐标
+		chessList.mapIndexedNotNull { index, chess ->
+			if (chess == Chess.EMPTY) {
+				listOf(index % 5, index / 5)
+			} else {
+				null
+			}
+		}.filter { (x, y) ->
+			// 找相邻有炮的
+			listOf(
+				this[x + 1, y],
+				this[x - 1, y],
+				this[x, y + 1],
+				this[x, y - 1],
+			).contains(Chess.CANNON)
+		}.count()
 
 }

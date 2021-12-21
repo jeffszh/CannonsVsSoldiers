@@ -19,16 +19,14 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		j.k = this
 	}
 
-	fun btn01Click() {
-		j.chessBoard.content.lastMove.value = ChessBoardContent.Move(
-			2, 3, 2, 2
-		)
+	fun btnRestartClick() {
+		j.chessBoard.content.setInitialContent()
 	}
 
 	fun btn02Click() {
-		j.chessBoard.content.lastMove.value = ChessBoardContent.Move(
-			3, 1, 1, 1
-		)
+//		j.chessBoard.content.lastMove.value = ChessBoardContent.Move(
+//			3, 1, 1, 1
+//		)
 	}
 
 }
