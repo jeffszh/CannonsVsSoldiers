@@ -102,4 +102,31 @@ class ChessBoardContent {
 		return result.toList()
 	}
 
+	fun isMoveValid(move: Move): Boolean {
+		with(move) {
+			val fromChess = this@ChessBoardContent[fromX, fromY]
+			val toChess = this@ChessBoardContent[toX, toY]
+			return fromChess != null && toChess != null && if (isCannonsTurn) {
+				when {
+					// 移动一格的情形
+					fromChess == Chess.CANNON && toChess == Chess.EMPTY ->
+						fromX - toX + fromY - toY in listOf(-1, 1)
+					// 吃的情形
+					fromChess == Chess.CANNON && toChess == Chess.SOLDIER ->
+						// 判断同行或同列距离2格
+						(fromX - toX) * (fromY - toY) == 0 &&
+								fromX - toX + fromY - toY in listOf(-2, 2) &&
+								// 中间必须是空格
+								this@ChessBoardContent[(fromX + toX) / 2, (fromY + toY) / 2
+								] == Chess.EMPTY
+					else -> false
+				}
+			} else {
+				// 兵只有移动一格
+				fromChess == Chess.SOLDIER && toChess == Chess.EMPTY &&
+						fromX - toX + fromY - toY in listOf(-1, 1)
+			}
+		}
+	}
+
 }

@@ -150,6 +150,8 @@ class ChessBoard : Pane() {
 	}
 
 	private fun setupDragDrop() {
+		var startDragX = -1
+		var startDragY = -1
 		setOnDragDetected { e ->
 			val (x, y) = mouseXyToChessBoardXy(e.x, e.y)
 			val chess = content[x, y]
@@ -161,18 +163,34 @@ class ChessBoard : Pane() {
 				}
 			) {
 				startDragAndDrop(TransferMode.MOVE).setContent {
-					putString(chess?.text)
+					chess ?: kotlin.error("不可能！")
+					putString("$x $y ${chess.text}")
+					startDragX = x
+					startDragY = y
 				}
-				println("开始拖拽--------------------------------------")
 			}
 		}
 		setOnDragEntered {
 		}
-		setOnDragOver {
+		setOnDragOver { e ->
+			val offset = -cellSizeProperty.value / 2
+			chessCells[startDragX + startDragY * 5].apply {
+				relocate(e.x + offset, e.y + offset)
+				toFront()
+			}
+			val (x, y) = mouseXyToChessBoardXy(e.x, e.y)
+			if (content.isMoveValid(ChessBoardContent.Move(startDragX, startDragY, x, y))) {
+				e.acceptTransferModes(TransferMode.MOVE)
+			}
 		}
-		setOnDragDropped {
+		setOnDragDropped { e ->
+			e.isDropCompleted = true
+			e.consume()
+			rearrangeCells()
 		}
-		setOnDragDone {
+		setOnDragDone { e ->
+			e.consume()
+			rearrangeCells()
 		}
 	}
 
