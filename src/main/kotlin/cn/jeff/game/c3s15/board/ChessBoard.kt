@@ -184,6 +184,9 @@ class ChessBoard : Pane() {
 			}
 		}
 		setOnDragDropped { e ->
+			val (x, y) = mouseXyToChessBoardXy(e.x, e.y)
+			content.applyMove(ChessBoardContent.Move(startDragX, startDragY, x, y))
+			lastMoveIndicator.toFront()
 			e.isDropCompleted = true
 			e.consume()
 			rearrangeCells()

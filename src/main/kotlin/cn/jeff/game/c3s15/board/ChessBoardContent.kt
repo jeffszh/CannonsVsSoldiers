@@ -18,8 +18,8 @@ class ChessBoardContent {
 	private val chessList = List(25) { Chess.EMPTY }.toObservable()
 	val lastMove = SimpleObjectProperty<Move>(null)
 	private val moveCountProperty = SimpleIntegerProperty(0)
-	var moveCount by moveCountProperty
-	val isCannonsTurn get() = (moveCount / 2) == 0
+	private var moveCount by moveCountProperty
+	val isCannonsTurn get() = (moveCount % 2) == 0
 
 	operator fun get(x: Int, y: Int) = if (x in 0..4 && y in 0..4) chessList[x + y * 5] else null
 
@@ -126,6 +126,15 @@ class ChessBoardContent {
 				fromChess == Chess.SOLDIER && toChess == Chess.EMPTY &&
 						fromX - toX + fromY - toY in listOf(-1, 1)
 			}
+		}
+	}
+
+	fun applyMove(move: Move) {
+		if (isMoveValid(move)) {
+			this[move.toX, move.toY] = this[move.fromX, move.fromY]!!
+			this[move.fromX, move.fromY] = Chess.EMPTY
+			lastMove.value = move
+			moveCount++
 		}
 	}
 
