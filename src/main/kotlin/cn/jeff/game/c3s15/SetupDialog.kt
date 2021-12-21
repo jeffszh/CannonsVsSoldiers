@@ -15,10 +15,10 @@ class SetupDialog : Fragment("设置") {
 		j = loader.getController()
 		j.k = this
 
-		j.tb01.text = "${GlobalVars.appConf.cannonText}方人脑"
-		j.tb02.text = "${GlobalVars.appConf.cannonText}方电脑"
-		j.tb03.text = "${GlobalVars.appConf.soldierText}方人脑"
-		j.tb04.text = "${GlobalVars.appConf.soldierText}方电脑"
+		j.tb01.text = "${GlobalVars.appConf.cannonText}由人脑控制"
+		j.tb02.text = "${GlobalVars.appConf.cannonText}由电脑控制"
+		j.tb03.text = "${GlobalVars.appConf.soldierText}由人脑控制"
+		j.tb04.text = "${GlobalVars.appConf.soldierText}由电脑控制"
 
 		j.tgCannon.selectToggle(
 			if (GlobalVars.cannonsUseAI)

@@ -17,6 +17,13 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		root = loader.load(javaClass.getResourceAsStream("/cn/jeff/game/c3s15/MainWnd.fxml"))
 		j = loader.getController()
 		j.k = this
+
+		j.label01.textProperty().bind(GlobalVars.cannonsUseAIProperty.stringBinding {
+			"${GlobalVars.appConf.cannonText}：${if (it == true) "電腦" else "人腦"}"
+		})
+		j.label02.textProperty().bind(GlobalVars.soldiersUseAIProperty.stringBinding {
+			"${GlobalVars.appConf.soldierText}：${if (it == true) "電腦" else "人腦"}"
+		})
 	}
 
 	fun btnRestartClick() {

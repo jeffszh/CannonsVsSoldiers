@@ -1,6 +1,7 @@
 package cn.jeff.game.c3s15
 
 import com.google.gson.GsonBuilder
+import javafx.beans.property.SimpleBooleanProperty
 import java.io.FileReader
 import java.io.FileWriter
 import java.io.IOException
@@ -27,7 +28,18 @@ object GlobalVars {
 		}
 	}
 
-	var cannonsUseAI = false
-	var soldiersUseAI = true
+	val cannonsUseAIProperty = SimpleBooleanProperty(false)
+	var cannonsUseAI: Boolean
+		get() = cannonsUseAIProperty.value
+		set(value) {
+			cannonsUseAIProperty.value = value
+		}
+
+	val soldiersUseAIProperty = SimpleBooleanProperty(true)
+	var soldiersUseAI: Boolean
+		get() = soldiersUseAIProperty.value
+		set(value) {
+			soldiersUseAIProperty.value = value
+		}
 
 }

@@ -10,7 +10,9 @@
 			xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
 			fx:controller="cn.jeff.game.c3s15.MainWndJ">
 	<top>
-		<HBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+		<HBox alignment="CENTER" spacing="30.0" BorderPane.alignment="CENTER">
+			<Label fx:id="label01" text="Label"/>
+			<Label fx:id="label02" text="Label"/>
 			<Button mnemonicParsing="false" onAction="#btnRestartClick" text="重新开始"/>
 			<Button mnemonicParsing="false" onAction="#btnSetupClick" text="设置"/>
 			<padding>
