@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="240.0" prefWidth="300.0"
+			style="-fx-font-family: 'Courier New'; -fx-font-size: 20;"
+			xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+			fx:controller="cn.jeff.game.c3s15.SetupDialogJ">
+	<center>
+		<VBox alignment="CENTER" BorderPane.alignment="CENTER">
+			<HBox alignment="CENTER">
+				<ToggleButton fx:id="tb01" mnemonicParsing="false" text="炮方人脑">
+					<toggleGroup>
+						<ToggleGroup fx:id="tgCannon"/>
+					</toggleGroup>
+				</ToggleButton>
+				<ToggleButton fx:id="tb02" mnemonicParsing="false" text="炮方电脑"
+							  toggleGroup="$tgCannon"/>
+				<padding>
+					<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+				</padding>
+			</HBox>
+			<HBox alignment="CENTER">
+				<ToggleButton fx:id="tb03" mnemonicParsing="false" text="兵方人脑">
+					<toggleGroup>
+						<ToggleGroup fx:id="tgSoldier"/>
+					</toggleGroup>
+				</ToggleButton>
+				<ToggleButton fx:id="tb04" mnemonicParsing="false" text="兵方电脑"
+							  toggleGroup="$tgSoldier"/>
+				<padding>
+					<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+				</padding>
+			</HBox>
+		</VBox>
+	</center>
+	<bottom>
+		<HBox alignment="CENTER" spacing="20.0" BorderPane.alignment="CENTER">
+			<padding>
+				<Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+			</padding>
+			<Button mnemonicParsing="false" onAction="#confirmBtnClicked" text="确定"/>
+			<Button mnemonicParsing="false" onAction="#cancelBtnClicked" text="取消"/>
+		</HBox>
+	</bottom>
+</BorderPane>

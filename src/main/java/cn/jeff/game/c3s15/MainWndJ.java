@@ -11,8 +11,8 @@ public class MainWndJ {
 		k.btnRestartClick();
 	}
 
-	public void btn02Click() {
-		k.btn02Click();
+	public void btnSetupClick() {
+		k.btnSetupClick();
 	}
 
 }

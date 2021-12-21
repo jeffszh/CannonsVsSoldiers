@@ -1,8 +1,8 @@
 package cn.jeff.game.c3s15
 
-import cn.jeff.game.c3s15.board.ChessBoardContent
 import javafx.fxml.FXMLLoader
 import javafx.scene.layout.BorderPane
+import javafx.stage.StageStyle
 import tornadofx.*
 
 class MainWnd : View(GlobalVars.appConf.mainTitle) {
@@ -23,10 +23,8 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		j.chessBoard.content.setInitialContent()
 	}
 
-	fun btn02Click() {
-//		j.chessBoard.content.lastMove.value = ChessBoardContent.Move(
-//			3, 1, 1, 1
-//		)
+	fun btnSetupClick() {
+		find(SetupDialog::class).openModal(StageStyle.UTILITY, resizable = false)
 	}
 
 }

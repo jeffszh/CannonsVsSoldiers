@@ -27,4 +27,7 @@ object GlobalVars {
 		}
 	}
 
+	var cannonsUseAI = false
+	var soldiersUseAI = true
+
 }
