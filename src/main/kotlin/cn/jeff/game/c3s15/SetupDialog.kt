@@ -32,7 +32,6 @@ class SetupDialog : Fragment("设置") {
 			else
 				j.tb03
 		)
-		println("---=== 初始化 ===---")
 	}
 
 	fun confirmBtnClicked() {

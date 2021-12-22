@@ -1,6 +1,7 @@
 package cn.jeff.game.c3s15.board
 
 import javafx.beans.property.ObjectProperty
+import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.*
@@ -17,10 +18,11 @@ class ChessBoardContent {
 
 	private val chessList = List(25) { Chess.EMPTY }.toObservable()
 	private val lastMove = SimpleObjectProperty<Move>(null)
-	private val moveCountProperty = SimpleIntegerProperty(0)
+	val moveCountProperty = SimpleIntegerProperty(0)
 	private var moveCount by moveCountProperty
 	val isCannonsTurn get() = (moveCount % 2) == 0
-	var gameOver = false
+	val gameOverProperty = SimpleBooleanProperty(false)
+	var gameOver by gameOverProperty
 	val isCannonsWin get() = gameOver && !isCannonsTurn
 
 	operator fun get(x: Int, y: Int) = if (x in 0..4 && y in 0..4) chessList[x + y * 5] else null
