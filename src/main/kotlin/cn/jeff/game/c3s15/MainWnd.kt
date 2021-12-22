@@ -1,5 +1,6 @@
 package cn.jeff.game.c3s15
 
+import cn.jeff.game.c3s15.brain.Brain
 import javafx.fxml.FXMLLoader
 import javafx.scene.layout.BorderPane
 import javafx.stage.StageStyle
@@ -24,6 +25,8 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		j.label02.textProperty().bind(GlobalVars.soldiersUseAIProperty.stringBinding {
 			"${GlobalVars.appConf.soldierText}：${if (it == true) "電腦" else "人腦"}"
 		})
+
+		find(Brain::class).startRunning()
 	}
 
 	fun btnRestartClick() {
