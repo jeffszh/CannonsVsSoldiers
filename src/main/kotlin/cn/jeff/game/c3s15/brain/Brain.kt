@@ -1,14 +1,16 @@
 package cn.jeff.game.c3s15.brain
 
 import cn.jeff.game.c3s15.GlobalVars
+import cn.jeff.game.c3s15.MainWnd
 import cn.jeff.game.c3s15.board.Chess
 import cn.jeff.game.c3s15.board.ChessBoardContent
+import cn.jeff.game.c3s15.event.MoveChessEvent
+import javafx.concurrent.Task
 import tornadofx.*
 
 class Brain(private val chessBoardContent: ChessBoardContent) {
 
-	private var currentTask: FXTask<*>? = null
-	private var currentSide = Chess.EMPTY
+	private var currentTask: Task<Unit>? = null
 	private var aiSettingChanging = false
 
 	init {
@@ -27,96 +29,55 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 		changeAiSetting()
 	}
 
-	fun startRunning() {
-		/*
-			println("===================================================")
-			val vv = GlobalVars.cannonsUseAIProperty.objectBinding(GlobalVars.soldiersUseAIProperty) {
-				when {
-					GlobalVars.cannonsUseAI -> Chess.CANNON
-					GlobalVars.soldiersUseAI -> Chess.SOLDIER
-					else -> Chess.EMPTY
-				}
-			}
-	//		object : ObjectBinding<Chess>() {
-	//			init {
-	//				bind(GlobalVars.cannonsUseAIProperty, GlobalVars.soldiersUseAIProperty)
-	//			}
-	//
-	//			override fun computeValue(): Chess =
-	//				when {
-	//					GlobalVars.cannonsUseAI -> Chess.CANNON
-	//					GlobalVars.soldiersUseAI -> Chess.SOLDIER
-	//					else -> Chess.EMPTY
-	//				}
-	//		}
-			vv.onChange {
-				println("--------------------- $it ----------------------------")
-			}
-			val ww = SimpleObjectProperty(Chess.EMPTY)
-			ww.bind(vv)
-			ww.onChange {
-				println("---------------------==== $it ====----------------------------")
-			}
-
-		 */
-
-		/*
-		val xx = GlobalVars.soldiersUseAIProperty and GlobalVars.cannonsUseAIProperty
-		println(xx)
-		val runOnWhichSide = SimpleObjectProperty<Chess>().objectBinding(
-			GlobalVars.soldiersUseAIProperty,
-			GlobalVars.cannonsUseAIProperty,
-			chessBoardContent.moveCountProperty,
-			chessBoardContent.gameOverProperty
-		) {
-			println("改............................................")
-			if (chessBoardContent.gameOver) {
-				Chess.EMPTY
-			} else {
-				if (chessBoardContent.isCannonsTurn) {
-					if (GlobalVars.cannonsUseAI) Chess.CANNON
-					else Chess.EMPTY
-				} else {
-					if (GlobalVars.soldiersUseAI) Chess.SOLDIER
-					else Chess.EMPTY
-				}
-			}
-		}
-		val rs = SimpleObjectProperty<Chess>()
-		rs.bind(runOnWhichSide)
-		rs.onChange {
-			println("改变！ $it")
-		}
-
-		 */
-
-//		runAsync(true) {
-//			while (true) {
-//				Thread.sleep(3000)
-//				println("时间：${Date()}")
-//			}
-//		}
-	}
-
 	private fun changeAiSetting() {
 		aiSettingChanging = true
 		// 运用技巧，避免重复触发。
 		runLater {
-			println("-----===== 改变AI设置 =====-----")
-			currentSide = if (chessBoardContent.gameOver) {
-				Chess.EMPTY
-			} else {
-				if (chessBoardContent.isCannonsTurn) {
-					if (GlobalVars.cannonsUseAI) Chess.CANNON
-					else Chess.EMPTY
+			if (aiSettingChanging) {
+				println("-----===== 改变AI设置 =====-----")
+				val runOnSide = if (chessBoardContent.gameOver) {
+					Chess.EMPTY
 				} else {
-					if (GlobalVars.soldiersUseAI) Chess.SOLDIER
-					else Chess.EMPTY
+					if (chessBoardContent.isCannonsTurn) {
+						if (GlobalVars.cannonsUseAI) Chess.CANNON
+						else Chess.EMPTY
+					} else {
+						if (GlobalVars.soldiersUseAI) Chess.SOLDIER
+						else Chess.EMPTY
+					}
 				}
+				println("-----===== $runOnSide =====-----")
+				startRunning(runOnSide)
+				aiSettingChanging = false
 			}
-			println("-----===== $currentSide =====-----")
-			aiSettingChanging = false
 		}
+	}
+
+	private fun stopPreviousTask() {
+		currentTask?.cancel()
+	}
+
+	private fun startRunning(runOnSide: Chess) {
+		stopPreviousTask()
+		when (runOnSide) {
+			Chess.SOLDIER, Chess.CANNON -> currentTask = runAsync(true) {
+				aiRoutine(runOnSide)
+			}
+			Chess.EMPTY -> {
+				// do nothing
+			}
+		}
+	}
+
+	private fun aiRoutine(runOnSide: Chess) {
+		Thread.sleep(3000)
+		find<MainWnd>().fire(
+			MoveChessEvent(
+				ChessBoardContent.Move(
+					2, 4, 2, 2
+				)
+			)
+		)
 	}
 
 }

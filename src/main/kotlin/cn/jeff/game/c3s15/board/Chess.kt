@@ -5,8 +5,25 @@ import javafx.scene.paint.Color
 
 enum class Chess(val text: String, val color: Color) {
 
-	EMPTY(" ", Color.BLACK),
-	SOLDIER(GlobalVars.appConf.soldierText, Color.BLUE),
-	CANNON(GlobalVars.appConf.cannonText, Color.RED),
+	EMPTY(" ", Color.BLACK) {
+		override val oppositeSide = EMPTY
+	},
+	SOLDIER(GlobalVars.appConf.soldierText, Color.BLUE) {
+		override val oppositeSide get() = CANNON
+	},
+	CANNON(GlobalVars.appConf.cannonText, Color.RED) {
+		override val oppositeSide = SOLDIER
+	},
+	;
+
+//	fun oppositeSide() {
+//		when (this) {
+//			EMPTY -> EMPTY
+//			SOLDIER -> CANNON
+//			CANNON -> SOLDIER
+//		}
+//	}
+
+	abstract val oppositeSide: Chess
 
 }

@@ -191,17 +191,21 @@ class ChessBoard : Pane() {
 		}
 		setOnDragDropped { e ->
 			val (x, y) = mouseXyToChessBoardXy(e.x, e.y)
-			content.applyMove(ChessBoardContent.Move(startDragX, startDragY, x, y))
-			lastMoveIndicator.toFront()
+			applyMove(ChessBoardContent.Move(startDragX, startDragY, x, y))
 			e.isDropCompleted = true
 			e.consume()
-			rearrangeCells()
-			showDialogIfGameOver()
 		}
 		setOnDragDone { e ->
 			e.consume()
 			rearrangeCells()
 		}
+	}
+
+	fun applyMove(move: ChessBoardContent.Move) {
+		content.applyMove(move)
+		lastMoveIndicator.toFront()
+		rearrangeCells()
+		showDialogIfGameOver()
 	}
 
 	private fun mouseXyToChessBoardXy(mX: Double, mY: Double) = listOf(

@@ -1,5 +1,6 @@
 package cn.jeff.game.c3s15
 
+import cn.jeff.game.c3s15.event.MoveChessEvent
 import javafx.fxml.FXMLLoader
 import javafx.scene.layout.BorderPane
 import javafx.stage.StageStyle
@@ -24,6 +25,10 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		j.label02.textProperty().bind(GlobalVars.soldiersUseAIProperty.stringBinding {
 			"${GlobalVars.appConf.soldierText}：${if (it == true) "電腦" else "人腦"}"
 		})
+
+		subscribe<MoveChessEvent> { e ->
+			j.chessBoard.applyMove(e.move)
+		}
 	}
 
 	fun btnRestartClick() {
