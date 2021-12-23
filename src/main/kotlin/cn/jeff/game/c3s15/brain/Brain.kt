@@ -7,6 +7,7 @@ import cn.jeff.game.c3s15.board.ChessBoardContent
 import cn.jeff.game.c3s15.event.MoveChessEvent
 import javafx.concurrent.Task
 import tornadofx.*
+import kotlin.random.Random
 
 class Brain(private val chessBoardContent: ChessBoardContent) {
 
@@ -98,24 +99,42 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 			// 实际上若是空集，则一定已经gameOver了。
 			return null to evaluateSituation(content)
 		}
-		return allPossibleMove.map { move ->
+		val allPossibleMoveAndEval = allPossibleMove.map { move ->
 			move to findBestMove(content.clone().apply {
 				applyMove(move)
 			}, currentDepth + 1).second
-		}.maxByOrNull {
+		}
+		val maxEval = allPossibleMoveAndEval.maxByOrNull {
 			// 若轮到炮走，求对炮最有利的局面，反之亦然。
 			if (content.isCannonsTurn)
 				-it.second
 			else
 				it.second
-		} ?: kotlin.error("不可能！前面已经检查过空集了。")
+		}?.second ?: kotlin.error("不可能！前面已经检查过空集了。")
+		val bestMoveList = allPossibleMoveAndEval.filter {
+			it.second == maxEval
+		}
+		return if (bestMoveList.count() > 1) {
+			bestMoveList[Random.nextInt(bestMoveList.count())]
+		} else {
+			bestMoveList[0]
+		}
 	}
 
 	private fun findAllPossibleMove(content: ChessBoardContent) =
 		// 很粗暴的方法，直接无脑穷举。
 		(0..4).flatMap { y ->
 			(0..4).flatMap { x ->
-				listOf(
+				val delta = listOf(
+					0, 1, 0, -1, 1, 0, -1, 0,
+					0, 2, 0, -2, 2, 0, -2, 0,
+				)
+				(0 until delta.count() / 2).map { i ->
+					val dx = delta[i * 2]
+					val dy = delta[i * 2 + 1]
+					ChessBoardContent.Move(x, y, x + dx, y + dy)
+				}
+				/*listOf(
 					ChessBoardContent.Move(x, y, x + 1, y),
 					ChessBoardContent.Move(x, y, x - 1, y),
 					ChessBoardContent.Move(x, y, x, y + 1),
@@ -124,7 +143,7 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 					ChessBoardContent.Move(x, y, x - 2, y),
 					ChessBoardContent.Move(x, y, x, y + 2),
 					ChessBoardContent.Move(x, y, x, y - 2),
-				)
+				)*/
 			}
 		}.filter {
 			content.isMoveValid(it)
