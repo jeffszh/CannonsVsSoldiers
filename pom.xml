@@ -90,6 +90,7 @@
 	<build>
 		<sourceDirectory>src/main/kotlin</sourceDirectory>
 		<plugins>
+
 			<plugin>
 				<groupId>org.jetbrains.kotlin</groupId>
 				<artifactId>kotlin-maven-plugin</artifactId>
@@ -114,6 +115,55 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- 用Maven菜单的 Plugins/assembly/assembly:assembly 来生成 jar 文件。 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.5.5</version>
+				<configuration>
+					<!-- 最终jar包的输出名
+					<finalName>Key-${version}</finalName>
+					-->
+					<!-- jar包输出目录，默认在target目录下-->
+					<outputDirectory>target</outputDirectory>
+					<appendAssemblyId>false</appendAssemblyId>
+					<archive>
+						<manifest>
+							<!--入口类  -->
+							<mainClass>cn.jeff.game.c3s15.Cannons3VsSoldiers15</mainClass>
+						</manifest>
+					</archive>
+					<descriptorRefs>
+						<!-- 打包的时候会将依赖一起打成一个jar包 -->
+						<descriptorRef>
+							jar-with-dependencies
+						</descriptorRef>
+					</descriptorRefs>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>compile</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>testCompile</id>
+						<phase>test-compile</phase>
+						<goals>
+							<goal>testCompile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
