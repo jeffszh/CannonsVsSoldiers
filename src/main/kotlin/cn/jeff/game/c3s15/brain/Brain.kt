@@ -85,6 +85,9 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 		content: ChessBoardContent,
 		currentDepth: Int
 	): Pair<ChessBoardContent.Move?, Int> {
+		runLater {
+			GlobalVars.aiTraversalCountProperty.value++
+		}
 		// 到达最大深度了，直接评估并返回。
 		if (currentDepth >= maxDepth) {
 			return null to evaluateSituation(content)
