@@ -12,6 +12,7 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 
 	private var currentTask: Task<Unit>? = null
 	private var aiSettingChanging = false
+	private val maxDepth = GlobalVars.appConf.aiDepth
 
 	init {
 		GlobalVars.cannonsUseAIProperty.onChange {
@@ -61,7 +62,7 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 		stopPreviousTask()
 		when (runOnSide) {
 			Chess.SOLDIER, Chess.CANNON -> currentTask = runAsync(true) {
-				aiRoutine(runOnSide)
+				aiRoutine()
 			}
 			Chess.EMPTY -> {
 				// do nothing
@@ -69,20 +70,69 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 		}
 	}
 
-	private fun aiRoutine(runOnSide: Chess) {
+	private fun aiRoutine() {
 		runLater {
 			GlobalVars.aiTraversalCountProperty.value = 0
 		}
-//		Thread.sleep(3000)
-//		find<MainWnd>().fire(
-//			MoveChessEvent(
-//				ChessBoardContent.Move(
-//					2, 4, 2, 2
-//				)
-//			)
-//		)
+		Thread.sleep(300)
+		val bestMove = findBestMove(chessBoardContent.clone(), 0).first
+		if (bestMove != null) {
+			find<MainWnd>().fire(MoveChessEvent(bestMove))
+		}
 	}
 
-//	private fun findBestMove(currentMoveList:List<ChessBoardContent.Move>):
+	private fun findBestMove(
+		content: ChessBoardContent,
+		currentDepth: Int
+	): Pair<ChessBoardContent.Move?, Int> {
+		// 到达最大深度了，直接评估并返回。
+		if (currentDepth >= maxDepth) {
+			return null to evaluateSituation(content)
+		}
+		val allPossibleMove = findAllPossibleMove(content)
+		// 若没有可以走的棋了，直接评估返回。
+		if (allPossibleMove.isEmpty() || content.gameOver) {
+			// 实际上若是空集，则一定已经gameOver了。
+			return null to evaluateSituation(content)
+		}
+		return allPossibleMove.map { move ->
+			move to findBestMove(content.clone().apply {
+				applyMove(move)
+			}, currentDepth + 1).second
+		}.maxByOrNull {
+			// 若轮到炮走，求对炮最有利的局面，反之亦然。
+			if (content.isCannonsTurn)
+				-it.second
+			else
+				it.second
+		} ?: kotlin.error("不可能！前面已经检查过空集了。")
+	}
+
+	private fun findAllPossibleMove(content: ChessBoardContent) =
+		// 很粗暴的方法，直接无脑穷举。
+		(0..4).flatMap { y ->
+			(0..4).flatMap { x ->
+				listOf(
+					ChessBoardContent.Move(x, y, x + 1, y),
+					ChessBoardContent.Move(x, y, x - 1, y),
+					ChessBoardContent.Move(x, y, x, y + 1),
+					ChessBoardContent.Move(x, y, x, y - 1),
+					ChessBoardContent.Move(x, y, x + 2, y),
+					ChessBoardContent.Move(x, y, x - 2, y),
+					ChessBoardContent.Move(x, y, x, y + 2),
+					ChessBoardContent.Move(x, y, x, y - 2),
+				)
+			}
+		}.filter {
+			content.isMoveValid(it)
+		}
+
+	/**
+	 * # 局面评估
+	 *
+	 * 数值越大对兵方越有利。
+	 */
+	private fun evaluateSituation(content: ChessBoardContent) =
+		content.livingSoldierCount() * 256 - content.cannonBreathCount()
 
 }

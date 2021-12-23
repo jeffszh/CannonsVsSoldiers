@@ -148,13 +148,13 @@ class ChessBoardContent {
 	/**
 	 * 剩余的【兵】的数量
 	 */
-	private fun livingSoldierCount() =
+	fun livingSoldierCount() =
 		chessList.count { it == Chess.SOLDIER }
 
 	/**
 	 * 【炮】的“气”的数量
 	 */
-	private fun cannonBreathCount(): Int =
+	fun cannonBreathCount(): Int =
 		// 找出所有空位的坐标
 		chessList.mapIndexedNotNull { index, chess ->
 			if (chess == Chess.EMPTY) {
@@ -171,5 +171,10 @@ class ChessBoardContent {
 				this[x, y - 1],
 			).contains(Chess.CANNON)
 		}.count()
+
+	fun clone() = ChessBoardContent().also {
+		it.chessList.setAll(chessList)
+		it.moveCount = moveCount
+	}
 
 }
