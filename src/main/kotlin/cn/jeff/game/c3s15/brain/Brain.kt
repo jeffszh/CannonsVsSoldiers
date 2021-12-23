@@ -104,17 +104,18 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 				applyMove(move)
 			}, currentDepth + 1).second
 		}
-		val maxEval = allPossibleMoveAndEval.maxByOrNull {
+		val allEval = allPossibleMoveAndEval.map { it.second }
+		val bestEval = if (content.isCannonsTurn) {
 			// 若轮到炮走，求对炮最有利的局面，反之亦然。
-			if (content.isCannonsTurn)
-				-it.second
-			else
-				it.second
-		}?.second ?: kotlin.error("不可能！前面已经检查过空集了。")
+			allEval.minOrNull()
+		} else {
+			allEval.maxOrNull()
+		} ?: kotlin.error("不可能！前面已经检查过空集了。")
 		val bestMoveList = allPossibleMoveAndEval.filter {
-			it.second == maxEval
+			it.second == bestEval
 		}
-		return if (bestMoveList.count() > 1) {
+		// 只有深度為零的時候才有必要計算隨機
+		return if (currentDepth == 0 && bestMoveList.count() > 1) {
 			bestMoveList[Random.nextInt(bestMoveList.count())]
 		} else {
 			bestMoveList[0]
