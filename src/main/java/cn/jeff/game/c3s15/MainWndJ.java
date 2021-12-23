@@ -9,6 +9,7 @@ public class MainWndJ {
 	public ChessBoard chessBoard;
 	public Label label01;
 	public Label label02;
+	public Label statusLabel;
 
 	public void btnRestartClick() {
 		k.btnRestartClick();

@@ -2,6 +2,7 @@ package cn.jeff.game.c3s15
 
 import com.google.gson.GsonBuilder
 import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.SimpleIntegerProperty
 import java.io.FileReader
 import java.io.FileWriter
 import java.io.IOException
@@ -41,5 +42,8 @@ object GlobalVars {
 		set(value) {
 			soldiersUseAIProperty.value = value
 		}
+
+	val aiTraversalCountProperty = SimpleIntegerProperty(0)
+	val aiTraversalCount: Int get() = aiTraversalCountProperty.value
 
 }

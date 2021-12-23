@@ -70,14 +70,19 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 	}
 
 	private fun aiRoutine(runOnSide: Chess) {
-		Thread.sleep(3000)
-		find<MainWnd>().fire(
-			MoveChessEvent(
-				ChessBoardContent.Move(
-					2, 4, 2, 2
-				)
-			)
-		)
+		runLater {
+			GlobalVars.aiTraversalCountProperty.value = 0
+		}
+//		Thread.sleep(3000)
+//		find<MainWnd>().fire(
+//			MoveChessEvent(
+//				ChessBoardContent.Move(
+//					2, 4, 2, 2
+//				)
+//			)
+//		)
 	}
+
+//	private fun findBestMove(currentMoveList:List<ChessBoardContent.Move>):
 
 }

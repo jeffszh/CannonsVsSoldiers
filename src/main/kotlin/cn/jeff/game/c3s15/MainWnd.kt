@@ -25,6 +25,33 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		j.label02.textProperty().bind(GlobalVars.soldiersUseAIProperty.stringBinding {
 			"${GlobalVars.appConf.soldierText}：${if (it == true) "電腦" else "人腦"}"
 		})
+		j.statusLabel.textProperty().bind(j.chessBoard.content.moveCountProperty.stringBinding(
+			j.chessBoard.content.gameOverProperty,
+			GlobalVars.cannonsUseAIProperty,
+			GlobalVars.soldiersUseAIProperty,
+			GlobalVars.aiTraversalCountProperty
+		) {
+			if (j.chessBoard.content.gameOver) {
+				if (j.chessBoard.content.isCannonsWin)
+					"【${GlobalVars.appConf.cannonText}】获胜！"
+				else
+					"【${GlobalVars.appConf.soldierText}】获胜！"
+			} else {
+				if (j.chessBoard.content.isCannonsTurn) {
+					if (GlobalVars.cannonsUseAI)
+						"电脑【${GlobalVars.appConf.cannonText}】" +
+								"正在思考：${GlobalVars.aiTraversalCount}"
+					else
+						"轮到玩家【${GlobalVars.appConf.cannonText}】走棋"
+				} else {
+					if (GlobalVars.soldiersUseAI)
+						"电脑【${GlobalVars.appConf.soldierText}】" +
+								"正在思考：${GlobalVars.aiTraversalCount}"
+					else
+						"轮到玩家【${GlobalVars.appConf.soldierText}】走棋"
+				}
+			}
+		})
 
 		subscribe<MoveChessEvent> { e ->
 			j.chessBoard.applyMove(e.move)
