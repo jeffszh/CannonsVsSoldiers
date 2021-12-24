@@ -164,15 +164,25 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<executions>
+					<!-- 替换 default-compile, 因为它会被 maven 特别处理 -->
 					<execution>
-						<id>compile</id>
+						<id>default-compile</id>
+						<phase>none</phase>
+					</execution>
+					<!-- 替换 default-testCompile, 因为它会被 maven 特别处理 -->
+					<execution>
+						<id>default-testCompile</id>
+						<phase>none</phase>
+					</execution>
+					<execution>
+						<id>java-compile</id>
 						<phase>compile</phase>
 						<goals>
 							<goal>compile</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>testCompile</id>
+						<id>java-test-compile</id>
 						<phase>test-compile</phase>
 						<goals>
 							<goal>testCompile</goal>
