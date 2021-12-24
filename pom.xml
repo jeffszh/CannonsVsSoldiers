@@ -138,9 +138,8 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.5.5</version>
 				<configuration>
-					<!-- 最终jar包的输出名
-					<finalName>Key-${version}</finalName>
-					-->
+					<!-- 最终jar包的输出名 -->
+					<finalName>CannonsVsSoldiers-${project.version}</finalName>
 					<!-- jar包输出目录，默认在target目录下-->
 					<outputDirectory>target</outputDirectory>
 					<appendAssemblyId>false</appendAssemblyId>
