@@ -91,13 +91,13 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 		}
 		// 到达最大深度了，直接评估并返回。
 		if (currentDepth >= maxDepth) {
-			return null to evaluateSituation(content)
+			return null to evaluateSituation(content, currentDepth)
 		}
 		val allPossibleMove = findAllPossibleMove(content)
 		// 若没有可以走的棋了，直接评估返回。
 		if (allPossibleMove.isEmpty() || content.gameOver) {
 			// 实际上若是空集，则一定已经gameOver了。
-			return null to evaluateSituation(content)
+			return null to evaluateSituation(content, currentDepth)
 		}
 		val allPossibleMoveAndEval = allPossibleMove.map { move ->
 			move to findBestMove(content.clone().apply {
@@ -155,7 +155,19 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 	 *
 	 * 数值越大对兵方越有利。
 	 */
-	private fun evaluateSituation(content: ChessBoardContent) =
-		content.livingSoldierCount() * 256 - content.cannonBreathCount()
+//	private fun evaluateSituation(content: ChessBoardContent) =
+//		content.livingSoldierCount() * 256 - content.cannonBreathCount()
+	// 改進一下，讓AI傾向於用較少的步數取得勝利。
+	private fun evaluateSituation(content: ChessBoardContent, currentDepth: Int) =
+		content.livingSoldierCount() * 256 - content.cannonBreathCount() * 16 +
+				if (content.isCannonsTurn == (currentDepth / 2 == 0)) {
+					// 若當前深度是偶數，頂層就跟當前層是同一方，
+					// 所以這條分支是正在計算炮方的最佳走法，將會求評估值的最小值，
+					// 步數多應該使評估值大些，所以加上正的[currentDepth]。
+					currentDepth
+				} else {
+					// 反之，兵方的評估值應該跟步數負相關。
+					-currentDepth
+				}
 
 }
