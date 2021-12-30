@@ -157,17 +157,24 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 	 */
 //	private fun evaluateSituation(content: ChessBoardContent) =
 //		content.livingSoldierCount() * 256 - content.cannonBreathCount()
-	// 改進一下，讓AI傾向於用較少的步數取得勝利。
-	private fun evaluateSituation(content: ChessBoardContent, currentDepth: Int) =
-		content.livingSoldierCount() * 256 - content.cannonBreathCount() * 16 +
-				if (content.isCannonsTurn == (currentDepth / 2 == 0)) {
-					// 若當前深度是偶數，頂層就跟當前層是同一方，
-					// 所以這條分支是正在計算炮方的最佳走法，將會求評估值的最小值，
-					// 步數多應該使評估值大些，所以加上正的[currentDepth]。
-					currentDepth
-				} else {
-					// 反之，兵方的評估值應該跟步數負相關。
-					-currentDepth
-				}
+	private fun evaluateSituation(content: ChessBoardContent, currentDepth: Int) = run {
+		val livingSoldierCount = content.livingSoldierCount()
+		val cannonBreathCount = content.cannonBreathCount()
+		when {
+			// 加大分出勝負的分值，讓AI敢於棄兵贏棋。
+			cannonBreathCount == 0 -> 0x10000
+			livingSoldierCount == 0 -> -0x10000
+			else -> livingSoldierCount * 256 - cannonBreathCount * 16
+		} + if (content.isCannonsTurn == (currentDepth / 2 == 0)) {
+			// 改進一下，讓AI傾向於用較少的步數取得勝利。
+			// 若當前深度是偶數，頂層就跟當前層是同一方，
+			// 所以這條分支是正在計算炮方的最佳走法，將會求評估值的最小值，
+			// 步數多應該使評估值大些，所以加上正的[currentDepth]。
+			currentDepth
+		} else {
+			// 反之，兵方的評估值應該跟步數負相關。
+			-currentDepth
+		}
+	}
 
 }
