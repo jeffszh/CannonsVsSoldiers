@@ -116,6 +116,8 @@ class ChessBoardContent {
 				when {
 					// 移动一格的情形
 					fromChess == Chess.CANNON && toChess == Chess.EMPTY ->
+                    // 判断同行或同列距离1格
+						(fromX - toX) * (fromY - toY) == 0 &&
 						fromX - toX + fromY - toY in listOf(-1, 1)
 					// 吃的情形
 					fromChess == Chess.CANNON && toChess == Chess.SOLDIER ->
