@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.*
+import kotlin.math.abs
 
 /**
  * # 棋盘的内容
@@ -108,31 +109,34 @@ class ChessBoardContent {
 		return result.toList()
 	}
 
-	fun isMoveValid(move: Move): Boolean {
-		with(move) {
-			val fromChess = this@ChessBoardContent[fromX, fromY]
-			val toChess = this@ChessBoardContent[toX, toY]
-			return fromChess != null && toChess != null && if (isCannonsTurn) {
+	fun isMoveValid(move: Move) = with(move) {
+		val fromChess = this@ChessBoardContent[fromX, fromY] ?: return@with false
+		val toChess = this@ChessBoardContent[toX, toY] ?: return@with false
+		val dx = abs(toX - fromX)
+		val dy = abs(toY - fromY)
+		when {
+			// 若同行或同列，dx或dy為零。
+			dx * dy != 0 -> false
+			isCannonsTurn -> {
 				when {
 					// 移动一格的情形
 					fromChess == Chess.CANNON && toChess == Chess.EMPTY ->
-                    // 判断同行或同列距离1格
-						(fromX - toX) * (fromY - toY) == 0 &&
-						fromX - toX + fromY - toY in listOf(-1, 1)
+						// 同行或同列距离1格
+						dx + dy == 1
 					// 吃的情形
 					fromChess == Chess.CANNON && toChess == Chess.SOLDIER ->
-						// 判断同行或同列距离2格
-						(fromX - toX) * (fromY - toY) == 0 &&
-								fromX - toX + fromY - toY in listOf(-2, 2) &&
+						// 同行或同列距离2格
+						dx + dy == 2 &&
 								// 中间必须是空格
 								this@ChessBoardContent[(fromX + toX) / 2, (fromY + toY) / 2
 								] == Chess.EMPTY
 					else -> false
 				}
-			} else {
+			}
+			else -> {
 				// 兵只有移动一格
 				fromChess == Chess.SOLDIER && toChess == Chess.EMPTY &&
-						fromX - toX + fromY - toY in listOf(-1, 1)
+						dx + dy == 1
 			}
 		}
 	}
