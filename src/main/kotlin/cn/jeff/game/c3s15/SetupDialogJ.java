@@ -7,13 +7,14 @@ public class SetupDialogJ {
 
 	public SetupDialog k;
 
-	public ToggleGroup tgCannon;
-	public ToggleGroup tgSoldier;
+	public ToggleGroup tgPlayerSetting;
 
 	public ToggleButton tb01;
 	public ToggleButton tb02;
 	public ToggleButton tb03;
 	public ToggleButton tb04;
+	public ToggleButton tb05;
+	public ToggleButton tb06;
 
 	public void confirmBtnClicked() {
 		k.confirmBtnClicked();

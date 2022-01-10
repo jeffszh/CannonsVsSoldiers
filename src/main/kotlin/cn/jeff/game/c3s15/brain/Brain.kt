@@ -16,10 +16,10 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 	private val maxDepth = GlobalVars.appConf.aiDepth
 
 	init {
-		GlobalVars.cannonsUseAIProperty.onChange {
+		GlobalVars.cannonsPlayerType.onChange {
 			changeAiSetting()
 		}
-		GlobalVars.soldiersUseAIProperty.onChange {
+		GlobalVars.soldiersPlayerType.onChange {
 			changeAiSetting()
 		}
 		chessBoardContent.gameOverProperty.onChange {
@@ -41,10 +41,10 @@ class Brain(private val chessBoardContent: ChessBoardContent) {
 					Chess.EMPTY
 				} else {
 					if (chessBoardContent.isCannonsTurn) {
-						if (GlobalVars.cannonsUseAI) Chess.CANNON
+						if (GlobalVars.cannonsPlayerType.value == PlayerType.AI) Chess.CANNON
 						else Chess.EMPTY
 					} else {
-						if (GlobalVars.soldiersUseAI) Chess.SOLDIER
+						if (GlobalVars.soldiersPlayerType.value == PlayerType.AI) Chess.SOLDIER
 						else Chess.EMPTY
 					}
 				}

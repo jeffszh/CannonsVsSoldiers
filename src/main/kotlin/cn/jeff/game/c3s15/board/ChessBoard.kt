@@ -2,6 +2,7 @@ package cn.jeff.game.c3s15.board
 
 import cn.jeff.game.c3s15.GlobalVars
 import cn.jeff.game.c3s15.brain.Brain
+import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.brain.calcArrowPolygonPoints
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -163,9 +164,9 @@ class ChessBoard : Pane() {
 			val chess = content[x, y]
 			println("${e.x},${e.y} --> $x,$y  $chess")
 			if (if (content.isCannonsTurn) {
-					chess == Chess.CANNON
+					chess == Chess.CANNON && GlobalVars.cannonsPlayerType.value == PlayerType.HUMAN
 				} else {
-					chess == Chess.SOLDIER
+					chess == Chess.SOLDIER && GlobalVars.soldiersPlayerType.value == PlayerType.HUMAN
 				}
 			) {
 				startDragAndDrop(TransferMode.MOVE).setContent {

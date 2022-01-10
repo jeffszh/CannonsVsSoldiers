@@ -1,8 +1,9 @@
 package cn.jeff.game.c3s15
 
+import cn.jeff.game.c3s15.brain.PlayerType
 import com.google.gson.GsonBuilder
-import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
+import javafx.beans.property.SimpleObjectProperty
 import java.io.FileReader
 import java.io.FileWriter
 import java.io.IOException
@@ -29,19 +30,22 @@ object GlobalVars {
 		}
 	}
 
-	val cannonsUseAIProperty = SimpleBooleanProperty(false)
-	var cannonsUseAI: Boolean
-		get() = cannonsUseAIProperty.value
-		set(value) {
-			cannonsUseAIProperty.value = value
-		}
+//	val cannonsUseAIProperty = SimpleBooleanProperty(false)
+//	var cannonsUseAI: Boolean
+//		get() = cannonsUseAIProperty.value
+//		set(value) {
+//			cannonsUseAIProperty.value = value
+//		}
+//
+//	val soldiersUseAIProperty = SimpleBooleanProperty(true)
+//	var soldiersUseAI: Boolean
+//		get() = soldiersUseAIProperty.value
+//		set(value) {
+//			soldiersUseAIProperty.value = value
+//		}
 
-	val soldiersUseAIProperty = SimpleBooleanProperty(true)
-	var soldiersUseAI: Boolean
-		get() = soldiersUseAIProperty.value
-		set(value) {
-			soldiersUseAIProperty.value = value
-		}
+	val cannonsPlayerType = SimpleObjectProperty(PlayerType.HUMAN)
+	val soldiersPlayerType = SimpleObjectProperty(PlayerType.AI)
 
 	val aiTraversalCountProperty = SimpleIntegerProperty(0)
 	val aiTraversalCount: Int get() = aiTraversalCountProperty.value
