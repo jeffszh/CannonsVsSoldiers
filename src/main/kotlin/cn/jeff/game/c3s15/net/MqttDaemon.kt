@@ -29,6 +29,9 @@ object MqttDaemon {
 		)
 	}
 
+	/** 给外面读取的 clientId */
+	val clientId get() = mqtt.clientId.toString()
+
 	// 发送和接收线程
 	private var receiverThread: Thread? = null
 	private var senderThread: Thread? = null
