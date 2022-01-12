@@ -138,15 +138,15 @@ object NetworkGameProcessor {
 					// 若对方仍然未配对好，与之配对。
 					println("对方仍未配对，要求与之配对。")
 					sendGameMsg(GameMessage(state, localId, receivedMsg.localId))
-					continue
 				} else if (receivedMsg.remoteId == localId) {
 					// 若已跟自己配对，进入游戏。
 					println("已配对，进入游戏。")
 					pairedRemoteId = receivedMsg.localId
 					state = NetGameState.REMOTE_TURN
+					break
 				}
 			}
-		} while (false)
+		} while (true)
 	}
 
 	private fun doWaitInvite() {
@@ -161,7 +161,7 @@ object NetworkGameProcessor {
 				} else if (receivedMsg.remoteId == localId) {
 					// 收到配對消息，回應確認配對。
 					println("收到配对邀请。")
-					sendGameMsg(GameMessage(state, localId, receivedMsg.remoteId))
+					sendGameMsg(GameMessage(state, localId, receivedMsg.localId))
 				}
 			}
 			NetGameState.REMOTE_TURN -> {
@@ -179,48 +179,51 @@ object NetworkGameProcessor {
 
 	private fun doRemoteTurn() {
 		sendGameMsg(GameMessage(state, localId, pairedRemoteId))
-		val receivedMsg = gameMsgQueue.poll(2000, TimeUnit.MILLISECONDS)
-		if (receivedMsg == null) {
-			remoteNoResponseCount++
-			if (remoteNoResponseCount > MAX_NO_RESPONSE_COUNT) {
-				state = NetGameState.LOST_CONN
+		while (true) {
+			val receivedMsg = gameMsgQueue.poll(2000, TimeUnit.MILLISECONDS)
+			if (receivedMsg == null) {
+				remoteNoResponseCount++
+				if (remoteNoResponseCount > MAX_NO_RESPONSE_COUNT) {
+					state = NetGameState.LOST_CONN
+				}
+				break
 			}
-			return
-		}
-		if (receivedMsg.state == NetGameState.LOCAL_TURN &&
-			receivedMsg.remoteId == localId &&
-			receivedMsg.localId == pairedRemoteId
-		) {
-			remoteNoResponseCount = 0
-			val remoteLastMove = receivedMsg.lastMove
-			if (remoteLastMove != null) {
-				// 若对方有走棋，判断跟本地棋盘是否一致。
-				val newChessBoardContent = localChessBoard.content.clone()
-				newChessBoardContent.applyMove(remoteLastMove)
-				if (newChessBoardContent.compressToInt64() == receivedMsg.packedChessCells) {
-					// 棋盘一致，确认走棋。
-					FX.eventbus.fire(MoveChessEvent(remoteLastMove))
-					state = if (newChessBoardContent.gameOver) {
-						NetGameState.GAME_OVER
-					} else {
-						localLastMove = null
-						NetGameState.LOCAL_TURN
+			if (receivedMsg.state == NetGameState.LOCAL_TURN &&
+				receivedMsg.remoteId == localId &&
+				receivedMsg.localId == pairedRemoteId
+			) {
+				remoteNoResponseCount = 0
+				val remoteLastMove = receivedMsg.lastMove
+				if (remoteLastMove != null) {
+					// 若对方有走棋，判断跟本地棋盘是否一致。
+					val newChessBoardContent = localChessBoard.content.clone()
+					newChessBoardContent.applyMove(remoteLastMove)
+					if (newChessBoardContent.compressToInt64() == receivedMsg.packedChessCells) {
+						// 棋盘一致，确认走棋。
+						FX.eventbus.fire(MoveChessEvent(remoteLastMove))
+						state = if (newChessBoardContent.gameOver) {
+							NetGameState.GAME_OVER
+						} else {
+							localLastMove = null
+							NetGameState.LOCAL_TURN
+						}
+						break
 					}
 				}
-			}
-		} else if (receivedMsg.state == NetGameState.REMOTE_TURN &&
-			receivedMsg.remoteId == localId &&
-			receivedMsg.localId == pairedRemoteId &&
-			localLastMove != null
-		) {
-			// 若对方仍然处于[NetGameState.REMOTE_TURN]状态，
-			// 即上次的走棋消息对方仍未收到，补发给对方。
-			sendGameMsg(
-				GameMessage(
-					NetGameState.LOCAL_TURN, localId, pairedRemoteId,
-					localPackedChessBoardContent, localLastMove
+			} else if (receivedMsg.state == NetGameState.REMOTE_TURN &&
+				receivedMsg.remoteId == localId &&
+				receivedMsg.localId == pairedRemoteId &&
+				localLastMove != null
+			) {
+				// 若对方仍然处于[NetGameState.REMOTE_TURN]状态，
+				// 即上次的走棋消息对方仍未收到，补发给对方。
+				sendGameMsg(
+					GameMessage(
+						NetGameState.LOCAL_TURN, localId, pairedRemoteId,
+						localPackedChessBoardContent, localLastMove
+					)
 				)
-			)
+			}
 		}
 	}
 
