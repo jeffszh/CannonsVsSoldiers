@@ -29,6 +29,7 @@ object NetworkGameProcessor {
 	private val soldiersPlayerType get() = GlobalVars.soldiersPlayerType.value
 
 	private val localId get() = MqttDaemon.clientId
+	private var pairedRemoteId = ""
 
 	init {
 		GlobalVars.cannonsPlayerType.onChange {
@@ -74,6 +75,9 @@ object NetworkGameProcessor {
 	 * * 炮方收到对方要求走棋的消息（[NetGameState.REMOTE_TURN]），进入对战状态。
 	 * * 之后双方不断交替要求走棋和回应未走棋或已走棋，游戏进行下去。
 	 * * 直到双方分出胜负，或出现网络异常。
+	 *
+	 * ` 注意：此流程策略是隨意配對，基於本遊戲就幾個相熟的人玩，不可作為參考。
+	 * 若要完善，必須要有房間的概念。 `
 	 */
 	private fun process() {
 		// println("thread name is ${Thread.currentThread().name}")
@@ -121,7 +125,8 @@ object NetworkGameProcessor {
 					continue
 				} else if (receivedMsg.remoteId == localId) {
 					// 若已跟自己配对，进入游戏。
-					state = NetGameState.LOCAL_TURN
+					pairedRemoteId = receivedMsg.localId
+					state = NetGameState.REMOTE_TURN
 				}
 			}
 		} while (false)
@@ -129,14 +134,28 @@ object NetworkGameProcessor {
 
 	private fun doWaitInvite() {
 		gameMsgQueue.poll(6400, TimeUnit.MILLISECONDS)?.also { receivedMsg ->
-			if (receivedMsg.state == NetGameState.INVITING) {
-				if (receivedMsg.remoteId.isEmpty()) {
-					// 收到邀请，作出回应。
-					sendGameMsg(
-						GameMessage(
-							NetGameState.WAIT_INV, localId, ""
+			when (receivedMsg.state) {
+				NetGameState.INVITING -> {
+					if (receivedMsg.remoteId.isEmpty()) {
+						// 收到邀请，作出回应。
+						sendGameMsg(
+							GameMessage(
+								NetGameState.WAIT_INV, localId, ""
+							)
 						)
-					)
+					} else if (receivedMsg.remoteId == localId) {
+						// 收到配對消息，回應確認配對。
+						sendGameMsg(
+							GameMessage(
+								NetGameState.WAIT_INV, localId, receivedMsg.remoteId
+							)
+						)
+					}
+				}
+				NetGameState.REMOTE_TURN -> {
+				}
+				else -> {
+					// do nothing
 				}
 			}
 		}
