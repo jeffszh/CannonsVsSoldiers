@@ -178,6 +178,7 @@ object NetworkGameProcessor {
 	}
 
 	private fun doRemoteTurn() {
+		println("催促对方走棋。")
 		sendGameMsg(GameMessage(state, localId, pairedRemoteId))
 		while (true) {
 			val receivedMsg = gameMsgQueue.poll(2000, TimeUnit.MILLISECONDS)
@@ -186,6 +187,7 @@ object NetworkGameProcessor {
 				if (remoteNoResponseCount > MAX_NO_RESPONSE_COUNT) {
 					state = NetGameState.LOST_CONN
 				}
+				// 收到空消息，就是已经过去两秒了，跳出，再次发出催促消息。
 				break
 			}
 			if (receivedMsg.state == NetGameState.LOCAL_TURN &&
@@ -201,12 +203,14 @@ object NetworkGameProcessor {
 					if (newChessBoardContent.compressToInt64() == receivedMsg.packedChessCells) {
 						// 棋盘一致，确认走棋。
 						FX.eventbus.fire(MoveChessEvent(remoteLastMove))
+						println("改状态")
 						state = if (newChessBoardContent.gameOver) {
 							NetGameState.GAME_OVER
 						} else {
 							localLastMove = null
 							NetGameState.LOCAL_TURN
 						}
+						println("状态为：$state")
 						break
 					}
 				}
