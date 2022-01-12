@@ -12,7 +12,7 @@ import tornadofx.*
 class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
 	override val root: BorderPane
-	private val j: MainWndJ
+	val j: MainWndJ
 
 	init {
 		primaryStage.isResizable = true
@@ -68,6 +68,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
 	fun btnRestartClick() {
 		j.chessBoard.content.setInitialContent()
+		NetworkGameProcessor.restart()
 	}
 
 	fun btnSetupClick() {

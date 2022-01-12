@@ -1,8 +1,10 @@
 package cn.jeff.game.c3s15.net
 
 import cn.jeff.game.c3s15.GlobalVars
+import cn.jeff.game.c3s15.MainWnd
 import cn.jeff.game.c3s15.board.ChessBoardContent
 import cn.jeff.game.c3s15.brain.PlayerType
+import cn.jeff.game.c3s15.event.MoveChessEvent
 import com.google.gson.GsonBuilder
 import tornadofx.*
 import java.util.concurrent.LinkedBlockingQueue
@@ -20,6 +22,8 @@ object NetworkGameProcessor {
 	// private val moveChessQueue = Exchanger<Pair<Long, ChessBoardContent.Move>>()
 
 	private val semPlayerSettingChange = Semaphore(0)
+
+	@Volatile
 	private var state = NetGameState.OFFLINE
 
 	@Volatile
@@ -27,9 +31,15 @@ object NetworkGameProcessor {
 
 	private val cannonsPlayerType get() = GlobalVars.cannonsPlayerType.value
 	private val soldiersPlayerType get() = GlobalVars.soldiersPlayerType.value
+	private val localChessBoard get() = find<MainWnd>().j.chessBoard
 
 	private val localId get() = MqttDaemon.clientId
 	private var pairedRemoteId = ""
+	private var remoteNoResponseCount = 0
+	private const val MAX_NO_RESPONSE_COUNT = 10
+
+	private var localPackedChessBoardContent = 0L
+	private var localLastMove: ChessBoardContent.Move? = null
 
 	init {
 		GlobalVars.cannonsPlayerType.onChange {
@@ -52,6 +62,7 @@ object NetworkGameProcessor {
 	fun restart() {
 		restarting = true
 		workThread.interrupt()
+		semPlayerSettingChange.release()
 	}
 
 	private val workThread = thread(start = false, name = this.javaClass.simpleName) {
@@ -86,10 +97,10 @@ object NetworkGameProcessor {
 				NetGameState.OFFLINE -> doOffline()
 				NetGameState.INVITING -> doInviting()
 				NetGameState.WAIT_INV -> doWaitInvite()
-				NetGameState.LOCAL_TURN -> TODO()
-				NetGameState.REMOTE_TURN -> TODO()
-				NetGameState.GAME_OVER -> TODO()
-				NetGameState.LOST_CONN -> TODO()
+				NetGameState.LOCAL_TURN -> doLocalTurn()
+				NetGameState.REMOTE_TURN -> doRemoteTurn()
+				NetGameState.GAME_OVER -> doIdle()
+				NetGameState.LOST_CONN -> doIdle()
 			}
 		}
 	}
@@ -110,18 +121,13 @@ object NetworkGameProcessor {
 	}
 
 	private fun doInviting() {
-		sendGameMsg(GameMessage(NetGameState.INVITING, localId, ""))
+		sendGameMsg(GameMessage(state, localId, ""))
 		do {
 			val receivedMsg = gameMsgQueue.poll(2500, TimeUnit.MILLISECONDS) ?: break
 			if (receivedMsg.state == NetGameState.WAIT_INV) {
 				if (receivedMsg.remoteId.isEmpty()) {
 					// 若对方仍然未配对好，与之配对。
-					sendGameMsg(
-						GameMessage(
-							NetGameState.INVITING,
-							localId, receivedMsg.localId
-						)
-					)
+					sendGameMsg(GameMessage(state, localId, receivedMsg.localId))
 					continue
 				} else if (receivedMsg.remoteId == localId) {
 					// 若已跟自己配对，进入游戏。
@@ -133,32 +139,108 @@ object NetworkGameProcessor {
 	}
 
 	private fun doWaitInvite() {
-		gameMsgQueue.poll(6400, TimeUnit.MILLISECONDS)?.also { receivedMsg ->
-			when (receivedMsg.state) {
-				NetGameState.INVITING -> {
-					if (receivedMsg.remoteId.isEmpty()) {
-						// 收到邀请，作出回应。
-						sendGameMsg(
-							GameMessage(
-								NetGameState.WAIT_INV, localId, ""
-							)
-						)
-					} else if (receivedMsg.remoteId == localId) {
-						// 收到配對消息，回應確認配對。
-						sendGameMsg(
-							GameMessage(
-								NetGameState.WAIT_INV, localId, receivedMsg.remoteId
-							)
-						)
-					}
-				}
-				NetGameState.REMOTE_TURN -> {
-				}
-				else -> {
-					// do nothing
+		// val receivedMsg = gameMsgQueue.poll(6400, TimeUnit.MILLISECONDS) ?: return
+		val receivedMsg = gameMsgQueue.take()
+		when (receivedMsg.state) {
+			NetGameState.INVITING -> {
+				if (receivedMsg.remoteId.isEmpty()) {
+					// 收到邀请，作出回应。
+					sendGameMsg(GameMessage(state, localId, ""))
+				} else if (receivedMsg.remoteId == localId) {
+					// 收到配對消息，回應確認配對。
+					sendGameMsg(GameMessage(state, localId, receivedMsg.remoteId))
 				}
 			}
+			NetGameState.REMOTE_TURN -> {
+				if (receivedMsg.remoteId == localId) {
+					pairedRemoteId = receivedMsg.localId
+					localLastMove = null
+					state = NetGameState.LOCAL_TURN
+				}
+			}
+			else -> {
+				// do nothing
+			}
 		}
+	}
+
+	private fun doRemoteTurn() {
+		sendGameMsg(GameMessage(state, localId, pairedRemoteId))
+		val receivedMsg = gameMsgQueue.poll(2000, TimeUnit.MILLISECONDS)
+		if (receivedMsg == null) {
+			remoteNoResponseCount++
+			if (remoteNoResponseCount > MAX_NO_RESPONSE_COUNT) {
+				state = NetGameState.LOST_CONN
+			}
+			return
+		}
+		if (receivedMsg.state == NetGameState.LOCAL_TURN &&
+			receivedMsg.remoteId == localId &&
+			receivedMsg.localId == pairedRemoteId
+		) {
+			remoteNoResponseCount = 0
+			val remoteLastMove = receivedMsg.lastMove
+			if (remoteLastMove != null) {
+				// 若对方有走棋，判断跟本地棋盘是否一致。
+				val newChessBoardContent = localChessBoard.content.clone()
+				newChessBoardContent.applyMove(remoteLastMove)
+				if (newChessBoardContent.compressToInt64() == receivedMsg.packedChessCells) {
+					// 棋盘一致，确认走棋。
+					FX.eventbus.fire(MoveChessEvent(remoteLastMove))
+					state = if (newChessBoardContent.gameOver) {
+						NetGameState.GAME_OVER
+					} else {
+						localLastMove = null
+						NetGameState.LOCAL_TURN
+					}
+				}
+			}
+		} else if (receivedMsg.state == NetGameState.REMOTE_TURN &&
+			receivedMsg.remoteId == localId &&
+			receivedMsg.localId == pairedRemoteId &&
+			localLastMove != null
+		) {
+			// 若对方仍然处于[NetGameState.REMOTE_TURN]状态，
+			// 即上次的走棋消息对方仍未收到，补发给对方。
+			sendGameMsg(
+				GameMessage(
+					NetGameState.LOCAL_TURN, localId, pairedRemoteId,
+					localPackedChessBoardContent, localLastMove
+				)
+			)
+		}
+	}
+
+	private fun doLocalTurn() {
+		// 轮到本地走棋的时候，其实根本不需要接收对方发来的消息，没有真正有意义的消息。
+		// 因此，专门等待本地玩家走棋就可以了。
+		val playerMove = moveChessQueue.poll(1300, TimeUnit.MILLISECONDS)
+		if (playerMove == null) {
+			// 还没走棋，发走棋为空的消息给对方。
+			sendGameMsg(GameMessage(state, localId, pairedRemoteId))
+		} else {
+			// 已经走棋了，先存起来，然后发给对方。
+			localPackedChessBoardContent = playerMove.first
+			localLastMove = playerMove.second
+			sendGameMsg(
+				GameMessage(
+					state, localId, pairedRemoteId,
+					localPackedChessBoardContent, localLastMove
+				)
+			)
+			// 先清空接收队列，然后切换到对方走棋状态。
+			gameMsgQueue.clear()
+			state = NetGameState.REMOTE_TURN
+		}
+		// 空读，避免消息堆积太多。
+		gameMsgQueue.poll()
+	}
+
+	private fun doIdle() {
+		while (semPlayerSettingChange.tryAcquire()) {
+			// do nothing
+		}
+		state = NetGameState.OFFLINE
 	}
 
 	private fun sendGameMsg(msg: GameMessage) {
@@ -174,6 +256,13 @@ object NetworkGameProcessor {
 			return
 		}
 		gameMsgQueue.offer(msg)
+	}
+
+	/** 本地走棋，从这里通知进来。 */
+	fun applyLocalMove(packedChessCells: Long, move: ChessBoardContent.Move) {
+		if (state == NetGameState.LOCAL_TURN) {
+			moveChessQueue.put(packedChessCells to move)
+		}
 	}
 
 }

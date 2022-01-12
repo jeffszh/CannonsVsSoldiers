@@ -90,6 +90,8 @@ class ChessBoardContent {
 		lastMove.bindBidirectional(uiLastMove)
 	}
 
+	fun compressToInt64() = compressToInt64(chessList)
+
 	private fun compressToInt64(chessList: List<Chess>): Long {
 		var result = 0L
 		for (i in chessList.indices) {

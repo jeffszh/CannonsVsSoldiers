@@ -4,6 +4,7 @@ import cn.jeff.game.c3s15.GlobalVars
 import cn.jeff.game.c3s15.brain.Brain
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.brain.calcArrowPolygonPoints
+import cn.jeff.game.c3s15.net.NetworkGameProcessor
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.scene.canvas.Canvas
@@ -207,6 +208,7 @@ class ChessBoard : Pane() {
 		lastMoveIndicator.toFront()
 		rearrangeCells()
 		showDialogIfGameOver()
+		NetworkGameProcessor.applyLocalMove(content.compressToInt64(), move)
 	}
 
 	private fun mouseXyToChessBoardXy(mX: Double, mY: Double) = listOf(
