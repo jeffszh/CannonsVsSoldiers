@@ -234,13 +234,19 @@ object NetworkGameProcessor {
 	}
 
 	private fun doLocalTurn() {
-		// 轮到本地走棋的时候，其实根本不需要接收对方发来的消息，没有真正有意义的消息。
-		// 因此，专门等待本地玩家走棋就可以了。
 		val playerMove = moveChessQueue.poll(1300, TimeUnit.MILLISECONDS)
 		if (playerMove == null) {
-			// 还没走棋，发走棋为空的消息给对方。
-			println("还没走棋，发走棋为空的消息给对方。")
-			sendGameMsg(GameMessage(state, localId, pairedRemoteId))
+			// 还没走棋，若對方催促，发走棋为空的消息给对方。
+			do {
+				val receivedMsg = gameMsgQueue.poll() ?: break
+				if (receivedMsg.state == NetGameState.REMOTE_TURN &&
+					receivedMsg.remoteId == localId &&
+					receivedMsg.localId == pairedRemoteId
+				) {
+					println("對方催促，发走棋为空的消息给对方。")
+					sendGameMsg(GameMessage(state, localId, pairedRemoteId))
+				}
+			} while (true)
 		} else {
 			// 已经走棋了，先存起来，然后发给对方。
 			println("已经走棋了，先存起来，然后发给对方。")
@@ -259,8 +265,6 @@ object NetworkGameProcessor {
 			}
 			state = NetGameState.REMOTE_TURN
 		}
-		// 空读，避免消息堆积太多。
-		gameMsgQueue.poll()
 	}
 
 	private fun doIdle() {

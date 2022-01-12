@@ -52,7 +52,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 						PlayerType.HUMAN -> "轮到玩家【${GlobalVars.appConf.soldierText}】走棋"
 						PlayerType.AI -> "电脑【${GlobalVars.appConf.soldierText}】" +
 								"正在思考：${GlobalVars.aiTraversalCount}"
-						PlayerType.NET -> "等待网友【${GlobalVars.appConf.cannonText}】走棋"
+						PlayerType.NET -> "等待网友【${GlobalVars.appConf.soldierText}】走棋"
 					}
 				}
 			}
