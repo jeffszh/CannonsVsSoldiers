@@ -60,7 +60,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		j.netStatusLabel.textProperty().bind(GlobalVars.netGameStateProperty.asString())
 
 		subscribe<MoveChessEvent> { e ->
-			j.chessBoard.applyMove(e.move)
+			j.chessBoard.applyMove(e.move, e.byRemote)
 		}
 		subscribe<ReceivedMqttMsg> { e ->
 			NetworkGameProcessor.onMqttReceived(e.msg)

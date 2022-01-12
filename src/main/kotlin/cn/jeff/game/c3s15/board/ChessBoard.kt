@@ -203,12 +203,14 @@ class ChessBoard : Pane() {
 		}
 	}
 
-	fun applyMove(move: ChessBoardContent.Move) {
+	fun applyMove(move: ChessBoardContent.Move, byRemote: Boolean = false) {
 		content.applyMove(move)
 		lastMoveIndicator.toFront()
 		rearrangeCells()
 		showDialogIfGameOver()
-		NetworkGameProcessor.applyLocalMove(content.compressToInt64(), move)
+		if (!byRemote) {
+			NetworkGameProcessor.applyLocalMove(content.compressToInt64(), move)
+		}
 	}
 
 	private fun mouseXyToChessBoardXy(mX: Double, mY: Double) = listOf(

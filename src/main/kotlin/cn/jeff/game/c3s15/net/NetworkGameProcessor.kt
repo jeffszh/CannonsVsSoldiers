@@ -190,6 +190,7 @@ object NetworkGameProcessor {
 				// 收到空消息，就是已经过去两秒了，跳出，再次发出催促消息。
 				break
 			}
+			println("當前：$state，收到非空消息：${receivedMsg.state}")
 			if (receivedMsg.state == NetGameState.LOCAL_TURN &&
 				receivedMsg.remoteId == localId &&
 				receivedMsg.localId == pairedRemoteId
@@ -202,7 +203,7 @@ object NetworkGameProcessor {
 					newChessBoardContent.applyMove(remoteLastMove)
 					if (newChessBoardContent.compressToInt64() == receivedMsg.packedChessCells) {
 						// 棋盘一致，确认走棋。
-						FX.eventbus.fire(MoveChessEvent(remoteLastMove))
+						FX.eventbus.fire(MoveChessEvent(remoteLastMove, true))
 						println("改状态")
 						state = if (newChessBoardContent.gameOver) {
 							NetGameState.GAME_OVER
@@ -221,6 +222,7 @@ object NetworkGameProcessor {
 			) {
 				// 若对方仍然处于[NetGameState.REMOTE_TURN]状态，
 				// 即上次的走棋消息对方仍未收到，补发给对方。
+				println("補發走棋消息。")
 				sendGameMsg(
 					GameMessage(
 						NetGameState.LOCAL_TURN, localId, pairedRemoteId,
@@ -237,9 +239,11 @@ object NetworkGameProcessor {
 		val playerMove = moveChessQueue.poll(1300, TimeUnit.MILLISECONDS)
 		if (playerMove == null) {
 			// 还没走棋，发走棋为空的消息给对方。
+			println("还没走棋，发走棋为空的消息给对方。")
 			sendGameMsg(GameMessage(state, localId, pairedRemoteId))
 		} else {
 			// 已经走棋了，先存起来，然后发给对方。
+			println("已经走棋了，先存起来，然后发给对方。")
 			localPackedChessBoardContent = playerMove.first
 			localLastMove = playerMove.second
 			sendGameMsg(
@@ -249,7 +253,10 @@ object NetworkGameProcessor {
 				)
 			)
 			// 先清空接收队列，然后切换到对方走棋状态。
-			gameMsgQueue.clear()
+			// gameMsgQueue.clear()
+			while (gameMsgQueue.poll() != null) {
+				// do nothing
+			}
 			state = NetGameState.REMOTE_TURN
 		}
 		// 空读，避免消息堆积太多。
