@@ -10,6 +10,7 @@ public class MainWndJ {
 	public Label label01;
 	public Label label02;
 	public Label statusLabel;
+	public Label netStatusLabel;
 
 	public void btnRestartClick() {
 		k.btnRestartClick();

@@ -87,7 +87,8 @@ object MqttDaemon {
 
 	private fun sender(conn: BlockingConnection) {
 		while (!Thread.interrupted()) {
-			val txt = "${mqtt.clientId}: ${sendingQueue.take()}"
+			// val txt = "${mqtt.clientId}: ${sendingQueue.take()}"
+			val txt = sendingQueue.take()
 			conn.publish(TOPIC, txt.toByteArray(Charsets.UTF_8), QoS.AT_MOST_ONCE, false)
 		}
 	}

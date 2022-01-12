@@ -25,6 +25,12 @@ object NetworkGameProcessor {
 
 	@Volatile
 	private var state = NetGameState.OFFLINE
+		private set(value) {
+			field = value
+			runLater {
+				GlobalVars.netGameStateProperty.value = value
+			}
+		}
 
 	@Volatile
 	private var restarting = false
@@ -121,16 +127,21 @@ object NetworkGameProcessor {
 	}
 
 	private fun doInviting() {
+		println("发出邀请。")
 		sendGameMsg(GameMessage(state, localId, ""))
 		do {
 			val receivedMsg = gameMsgQueue.poll(2500, TimeUnit.MILLISECONDS) ?: break
+			println("收到消息……${receivedMsg.state}")
 			if (receivedMsg.state == NetGameState.WAIT_INV) {
+				println("localId=$localId remoteId=${receivedMsg.remoteId}")
 				if (receivedMsg.remoteId.isEmpty()) {
 					// 若对方仍然未配对好，与之配对。
+					println("对方仍未配对，要求与之配对。")
 					sendGameMsg(GameMessage(state, localId, receivedMsg.localId))
 					continue
 				} else if (receivedMsg.remoteId == localId) {
 					// 若已跟自己配对，进入游戏。
+					println("已配对，进入游戏。")
 					pairedRemoteId = receivedMsg.localId
 					state = NetGameState.REMOTE_TURN
 				}
@@ -145,9 +156,11 @@ object NetworkGameProcessor {
 			NetGameState.INVITING -> {
 				if (receivedMsg.remoteId.isEmpty()) {
 					// 收到邀请，作出回应。
+					println("收到邀请消息。")
 					sendGameMsg(GameMessage(state, localId, ""))
 				} else if (receivedMsg.remoteId == localId) {
 					// 收到配對消息，回應確認配對。
+					println("收到配对邀请。")
 					sendGameMsg(GameMessage(state, localId, receivedMsg.remoteId))
 				}
 			}

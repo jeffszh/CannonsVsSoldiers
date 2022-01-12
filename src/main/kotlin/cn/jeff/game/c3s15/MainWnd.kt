@@ -57,6 +57,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 				}
 			}
 		})
+		j.netStatusLabel.textProperty().bind(GlobalVars.netGameStateProperty.asString())
 
 		subscribe<MoveChessEvent> { e ->
 			j.chessBoard.applyMove(e.move)
