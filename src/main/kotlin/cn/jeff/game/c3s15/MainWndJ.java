@@ -20,4 +20,8 @@ public class MainWndJ {
 		k.btnSetupClick();
 	}
 
+	public void btnSetChannelClick() {
+		k.btnSetChannelClick();
+	}
+
 }

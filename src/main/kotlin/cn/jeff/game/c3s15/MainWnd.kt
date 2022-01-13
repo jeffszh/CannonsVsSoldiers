@@ -3,8 +3,10 @@ package cn.jeff.game.c3s15
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.MoveChessEvent
 import cn.jeff.game.c3s15.event.ReceivedMqttMsg
+import cn.jeff.game.c3s15.net.MqttDaemon
 import cn.jeff.game.c3s15.net.NetworkGameProcessor
 import javafx.fxml.FXMLLoader
+import javafx.geometry.Pos
 import javafx.scene.layout.BorderPane
 import javafx.stage.StageStyle
 import tornadofx.*
@@ -74,6 +76,44 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
 	fun btnSetupClick() {
 		find(SetupDialog::class).openModal(StageStyle.UTILITY, resizable = false)
+	}
+
+	fun btnSetChannelClick() {
+		dialog("对战通道") {
+			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
+			alignment = Pos.CENTER
+			spacing = 10.0
+			paddingAll = 20.0
+			val inputText = textfield(MqttDaemon.channelNum.toString())
+			hbox {
+				alignment = Pos.CENTER
+				spacing = 10.0
+				label("通道号")
+				add(inputText)
+			}
+			hbox {
+				alignment = Pos.CENTER
+				spacing = 10.0
+				button("确定") {
+					isDefaultButton = true
+					action {
+						val txt = inputText.text
+						val num = if (txt.isInt()) txt.toInt() else -1
+						if (num in 0..99999) {
+							MqttDaemon.channelNum = num
+							close()
+						} else {
+							information("请输入5位以内的数字。")
+						}
+					}
+				}
+				button("取消") {
+					action {
+						close()
+					}
+				}
+			}
+		}
 	}
 
 }
