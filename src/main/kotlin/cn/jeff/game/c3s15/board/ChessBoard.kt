@@ -212,11 +212,11 @@ class ChessBoard : Pane() {
 		) {
 			return
 		}
-		content.applyMove(move)
+		val moveSuccess = content.applyMove(move)
 		lastMoveIndicator.toFront()
 		rearrangeCells()
 		showDialogIfGameOver()
-		if (!byRemote) {
+		if (moveSuccess && !byRemote) {
 			NetworkGameProcessor.applyLocalMove(content.compressToInt64(), move)
 		}
 	}

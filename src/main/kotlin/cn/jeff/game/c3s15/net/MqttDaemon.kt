@@ -22,6 +22,10 @@ object MqttDaemon {
 	// 主题
 	private const val TOPIC = "cn.jeff.game.C3S15"
 
+	// QOS
+	private val usingQoS = QoS.AT_MOST_ONCE
+	// private val usingQoS = QoS.EXACTLY_ONCE
+
 	// MQTT对象
 	private val mqtt = MQTT().apply {
 		clientId = UTF8Buffer(
@@ -76,7 +80,7 @@ object MqttDaemon {
 	}
 
 	private fun receiver(conn: BlockingConnection) {
-		conn.subscribe(arrayOf(Topic(TOPIC, QoS.AT_MOST_ONCE)))
+		conn.subscribe(arrayOf(Topic(TOPIC, usingQoS)))
 		while (!Thread.interrupted()) {
 			val msg = conn.receive()
 			val txt = msg.payload.toString(Charsets.UTF_8)
@@ -89,7 +93,7 @@ object MqttDaemon {
 		while (!Thread.interrupted()) {
 			// val txt = "${mqtt.clientId}: ${sendingQueue.take()}"
 			val txt = sendingQueue.take()
-			conn.publish(TOPIC, txt.toByteArray(Charsets.UTF_8), QoS.AT_MOST_ONCE, false)
+			conn.publish(TOPIC, txt.toByteArray(Charsets.UTF_8), usingQoS, false)
 		}
 	}
 

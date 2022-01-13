@@ -143,13 +143,25 @@ class ChessBoardContent {
 		}
 	}
 
-	fun applyMove(move: Move) {
-		if (isMoveValid(move)) {
+	/**
+	 * # 走棋
+	 *
+	 * 把[move]应用到棋盘内容，棋盘的内容会改变，
+	 * 一系列属性（[moveCount]、[gameOver]等）也随之改变。
+	 *
+	 * @param move 欲应用的棋步
+	 * @return 若成功（棋步合法），返回true。
+	 */
+	fun applyMove(move: Move): Boolean {
+		return if (isMoveValid(move)) {
 			this[move.toX, move.toY] = this[move.fromX, move.fromY]!!
 			this[move.fromX, move.fromY] = Chess.EMPTY
 			lastMove.value = move
 			moveCount++
 			gameOver = livingSoldierCount() == 0 || cannonBreathCount() == 0
+			true
+		} else {
+			false
 		}
 	}
 
