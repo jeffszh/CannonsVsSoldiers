@@ -142,6 +142,7 @@ object NetworkGameProcessor {
 					// 若已跟自己配对，进入游戏。
 					println("已配对，进入游戏。")
 					pairedRemoteId = receivedMsg.localId
+					remoteNoResponseCount = 0
 					state = NetGameState.REMOTE_TURN
 					break
 				}
@@ -264,6 +265,7 @@ object NetworkGameProcessor {
 			while (gameMsgQueue.poll() != null) {
 				// do nothing
 			}
+			remoteNoResponseCount = 0
 			state = NetGameState.REMOTE_TURN
 		}
 	}

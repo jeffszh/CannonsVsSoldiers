@@ -72,6 +72,7 @@ object MqttDaemon {
 					receiver(conn)
 				} catch (e: InterruptedException) {
 					e.printStackTrace()
+					conn.disconnect()
 				}
 			}
 			senderThread = thread(name = "MQTT_sender") {
@@ -79,6 +80,7 @@ object MqttDaemon {
 					sender(conn)
 				} catch (e: InterruptedException) {
 					e.printStackTrace()
+					conn.disconnect()
 				}
 			}
 		}
