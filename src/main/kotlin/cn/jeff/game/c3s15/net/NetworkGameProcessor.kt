@@ -165,6 +165,7 @@ object NetworkGameProcessor {
 				}
 			}
 			NetGameState.REMOTE_TURN -> {
+				// 收到对方催促走棋，对方已进入对战状态，自己也进入对战状态。
 				if (receivedMsg.remoteId == localId) {
 					pairedRemoteId = receivedMsg.localId
 					localLastMove = null
