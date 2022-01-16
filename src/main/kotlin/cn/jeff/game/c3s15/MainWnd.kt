@@ -116,4 +116,43 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		}
 	}
 
+	fun btnSetAiDepth() {
+		dialog("AI設置") {
+			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
+			alignment = Pos.CENTER
+			spacing = 10.0
+			paddingAll = 20.0
+			val inputText = textfield(GlobalVars.appConf.aiDepth.toString())
+			hbox {
+				alignment = Pos.CENTER
+				spacing = 10.0
+				label("AI计算深度")
+				add(inputText)
+			}
+			hbox {
+				alignment = Pos.CENTER
+				spacing = 10.0
+				button("确定") {
+					isDefaultButton = true
+					action {
+						val txt = inputText.text
+						val num = if (txt.isInt()) txt.toInt() else -1
+						if (num in 1..9) {
+							GlobalVars.appConf.aiDepth=num
+							GlobalVars.saveConf()
+							close()
+						} else {
+							information("请输入1-9。")
+						}
+					}
+				}
+				button("取消") {
+					action {
+						close()
+					}
+				}
+			}
+		}
+	}
+
 }

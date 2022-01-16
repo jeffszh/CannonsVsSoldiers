@@ -1,6 +1,7 @@
 package cn.jeff.game.c3s15;
 
 import cn.jeff.game.c3s15.board.ChessBoard;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 
 public class MainWndJ {
@@ -22,6 +23,10 @@ public class MainWndJ {
 
 	public void btnSetChannelClick() {
 		k.btnSetChannelClick();
+	}
+
+	public void btnSetAiDepth() {
+		k.btnSetAiDepth();
 	}
 
 }

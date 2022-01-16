@@ -18,6 +18,7 @@
 				<items>
 					<MenuItem mnemonicParsing="false" onAction="#btnSetupClick" text="玩家设置"/>
 					<MenuItem mnemonicParsing="false" onAction="#btnSetChannelClick" text="对战通道"/>
+					<MenuItem mnemonicParsing="false" onAction="#btnSetAiDepth" text="难度设置"/>
 				</items>
 			</MenuButton>
 			<padding>
