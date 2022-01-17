@@ -153,9 +153,7 @@ class MqttLink(initiative: Boolean, op: MqttLink.() -> Unit) : AutoCloseable {
 		} catch (e: InterruptedException) {
 			// do nothing
 		} catch (e: Exception) {
-			println("###################################################################")
 			onErrorFunc(e)
-			println("###################################################################")
 			close()
 		}
 	}

@@ -3,6 +3,7 @@ package cn.jeff.game.c3s15
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.MoveChessEvent
 import cn.jeff.game.c3s15.net.MqttDaemon
+import cn.jeff.game.c3s15.net.MqttLink
 import cn.jeff.game.c3s15.net.NetworkGameProcessor
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
@@ -71,6 +72,64 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 	fun btnRestartClick() {
 		j.chessBoard.content.setInitialContent()
 		NetworkGameProcessor.restart()
+		showConnectDialogIfNeed()
+	}
+
+	private fun showConnectDialogIfNeed() {
+		if (GlobalVars.cannonsPlayerType.value == PlayerType.NET ||
+			GlobalVars.soldiersPlayerType.value == PlayerType.NET
+		) {
+			dialog("连接方式") {
+				style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
+				hbox {
+					spacing = 10.0
+					button("蓝牙") {
+						action { }
+					}
+					button("互联网") {
+						action {
+							close()
+							showMqttWaitConnectDialog()
+						}
+					}
+					button("取消") {
+						action { close() }
+					}
+				}
+			}
+		}
+	}
+
+	private fun showMqttWaitConnectDialog() {
+		val (title, initiative) = if (GlobalVars.cannonsPlayerType.value == PlayerType.NET) {
+			"正在等待网友连接……" to false
+		} else {
+			"正在连接网友……" to true
+		}
+		dialog(title) {
+			GlobalVars.mqttLink?.close()
+			GlobalVars.mqttLink = MqttLink(initiative) {
+				onConnect {
+					runLater {
+						this@dialog.close()
+						information("成功连接网友。")
+					}
+				}
+				onError {
+					runLater {
+						this@dialog.close()
+						warning("出错：${it.message}")
+					}
+				}
+				onReceive {
+					NetworkGameProcessor.onMqttReceived(it)
+				}
+			}
+			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
+			button("取消") {
+				action { close() }
+			}
+		}
 	}
 
 	fun btnSetupClick() {
@@ -137,7 +196,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 						val txt = inputText.text
 						val num = if (txt.isInt()) txt.toInt() else -1
 						if (num in 1..9) {
-							GlobalVars.appConf.aiDepth=num
+							GlobalVars.appConf.aiDepth = num
 							GlobalVars.saveConf()
 							close()
 						} else {
