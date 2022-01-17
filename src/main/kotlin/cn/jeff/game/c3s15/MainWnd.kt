@@ -2,7 +2,6 @@ package cn.jeff.game.c3s15
 
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.MoveChessEvent
-import cn.jeff.game.c3s15.event.ReceivedMqttMsg
 import cn.jeff.game.c3s15.net.MqttDaemon
 import cn.jeff.game.c3s15.net.NetworkGameProcessor
 import javafx.fxml.FXMLLoader
@@ -64,9 +63,9 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		subscribe<MoveChessEvent> { e ->
 			j.chessBoard.applyMove(e.move, e.byRemote)
 		}
-		subscribe<ReceivedMqttMsg> { e ->
-			NetworkGameProcessor.onMqttReceived(e.msg)
-		}
+//		subscribe<ReceivedMqttMsg> { e ->
+//			NetworkGameProcessor.onMqttReceived(e.msg)
+//		}
 	}
 
 	fun btnRestartClick() {
