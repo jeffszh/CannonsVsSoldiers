@@ -2,6 +2,7 @@ package cn.jeff.game.c3s15.net
 
 import com.google.gson.GsonBuilder
 import java.io.IOException
+import java.util.*
 import kotlin.concurrent.thread
 
 class MqttLink(initiative: Boolean, op: MqttLink.() -> Unit) : AutoCloseable {
@@ -89,22 +90,23 @@ class MqttLink(initiative: Boolean, op: MqttLink.() -> Unit) : AutoCloseable {
 	}
 
 	private fun runInitiative() {
-		while (!Thread.interrupted()) {
+		while (true) {
 			sendPacket(LinkPacket.PacketType.CONNECT, localId, "", "")
-			val packet = receivePacket(300)
-			if (packet != null &&
-				packet.packetType == LinkPacket.PacketType.CONN_ACK &&
-				packet.remoteId == localId
-			) {
-				val remoteId = packet.localId
-				sendPacket(LinkPacket.PacketType.CONNECTED, localId, remoteId, "")
-				return runConnected(remoteId)
+			nullPacket@ while (true) {
+				val packet = receivePacket(1500) ?: break@nullPacket
+				if (packet.packetType == LinkPacket.PacketType.CONN_ACK &&
+					packet.remoteId == localId
+				) {
+					val remoteId = packet.localId
+					sendPacket(LinkPacket.PacketType.CONNECTED, localId, remoteId, "")
+					return runConnected(remoteId)
+				}
 			}
 		}
 	}
 
 	private fun runPassive() {
-		while (!Thread.interrupted()) {
+		while (true) {
 			val packet = receivePacket(20000)
 			if (packet != null) {
 				when (packet.packetType) {
@@ -133,20 +135,41 @@ class MqttLink(initiative: Boolean, op: MqttLink.() -> Unit) : AutoCloseable {
 		heartBeatThread = thread(name = "MQTT_LINK_HEARTBEAT_THREAD") {
 			runHeartBeat()
 		}
-		while (true) {
-			val packet = receivePacket(LINK_TIMEOUT) ?: throw IOException("MqttLink超时断线！")
-			if (packet.packetType == LinkPacket.PacketType.DATA &&
-				packet.remoteId == localId
-			) {
-				onReceiveFunc(packet.data)
+		try {
+			var lastReceiveTime = Date().time
+			while (true) {
+				if ((Date().time - lastReceiveTime) > LINK_TIMEOUT)
+					throw IOException("MqttLink超时断线！")
+				val packet = receivePacket(LINK_TIMEOUT) ?: throw IOException("MqttLink超时断线！")
+				if (packet.remoteId == localId) {
+					lastReceiveTime = Date().time
+				} else {
+					continue
+				}
+				if (packet.packetType == LinkPacket.PacketType.DATA) {
+					onReceiveFunc(packet.data)
+				}
 			}
+		} catch (e: InterruptedException) {
+			// do nothing
+		} catch (e: Exception) {
+			println("###################################################################")
+			onErrorFunc(e)
+			println("###################################################################")
+			close()
 		}
 	}
 
 	private fun runHeartBeat() {
-		while (true) {
-			Thread.sleep(3000)
-			sendPacket(LinkPacket.PacketType.HEARTBEAT, localId, remoteId, "")
+		try {
+			while (true) {
+				Thread.sleep(3000)
+				sendPacket(LinkPacket.PacketType.HEARTBEAT, localId, remoteId, "")
+			}
+		} catch (e: InterruptedException) {
+			// do nothing
+		} catch (e: Exception) {
+			onErrorFunc(e)
 		}
 	}
 

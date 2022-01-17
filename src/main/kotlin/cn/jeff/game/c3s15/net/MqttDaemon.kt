@@ -73,7 +73,7 @@ object MqttDaemon {
 				try {
 					receiver(conn)
 				} catch (e: InterruptedException) {
-					e.printStackTrace()
+					// e.printStackTrace()
 					conn.disconnect()
 				}
 			}
@@ -81,7 +81,7 @@ object MqttDaemon {
 				try {
 					sender(conn)
 				} catch (e: InterruptedException) {
-					e.printStackTrace()
+					// e.printStackTrace()
 					conn.disconnect()
 				}
 			}

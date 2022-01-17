@@ -24,7 +24,7 @@ fun main() {
 		mqttLink.sendData("你好！我是李四。")
 		Thread.sleep(2000)
 		mqttLink.sendData("将残的灯火他不吹灭。")
-		Thread.sleep(12000)
+		Thread.sleep(15000)
 	}
 	MqttDaemon.stop()
 	println("结束")
