@@ -2,7 +2,6 @@ package cn.jeff.game.c3s15
 
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.net.MqttLink
-import cn.jeff.game.c3s15.net.NetGameState
 import com.google.gson.GsonBuilder
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -52,7 +51,7 @@ object GlobalVars {
 	val aiTraversalCountProperty = SimpleIntegerProperty(0)
 	val aiTraversalCount: Int get() = aiTraversalCountProperty.value
 
-	val netGameStateProperty = SimpleObjectProperty(NetGameState.OFFLINE)
+//	val netGameStateProperty = SimpleObjectProperty(NetGameState.OFFLINE)
 
 	var mqttLink: MqttLink? = null
 

@@ -71,7 +71,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 
 	fun btnRestartClick() {
 		j.chessBoard.content.setInitialContent()
-		NetworkGameProcessor.restart()
+		// NetworkGameProcessor.restart()
 		showConnectDialogIfNeed()
 	}
 
@@ -108,11 +108,13 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		}
 		dialog(title) {
 			GlobalVars.mqttLink?.close()
-			GlobalVars.mqttLink = MqttLink(initiative) {
+			GlobalVars.mqttLink = null
+			MqttLink(initiative) {
 				onConnect {
 					runLater {
 						this@dialog.close()
 						information("成功连接网友。")
+						GlobalVars.mqttLink = this
 					}
 				}
 				onError {
@@ -127,7 +129,9 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 			}
 			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
 			button("取消") {
-				action { close() }
+				action {
+					close()
+				}
 			}
 		}
 	}

@@ -3,6 +3,7 @@ package cn.jeff.game.c3s15.net
 /**
  * 網戰狀態
  */
+/*
 enum class NetGameState {
 
 	/** 離線 */
@@ -27,3 +28,4 @@ enum class NetGameState {
 	LOST_CONN,
 
 }
+*/

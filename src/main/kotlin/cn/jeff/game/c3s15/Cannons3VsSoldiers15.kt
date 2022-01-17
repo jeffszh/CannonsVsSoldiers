@@ -1,7 +1,6 @@
 package cn.jeff.game.c3s15
 
 import cn.jeff.game.c3s15.net.MqttDaemon
-import cn.jeff.game.c3s15.net.NetworkGameProcessor
 import javafx.stage.Stage
 import tornadofx.*
 
@@ -15,13 +14,13 @@ class Cannons3VsSoldiers15 : App(MainWnd::class) {
 	override fun start(stage: Stage) {
 		super.start(stage)
 		MqttDaemon.start()
-		NetworkGameProcessor.start()
+		// NetworkGameProcessor.start()
 	}
 
 	override fun stop() {
 		super.stop()
 		MqttDaemon.stop()
-		NetworkGameProcessor.stop()
+		// NetworkGameProcessor.stop()
 		GlobalVars.mqttLink?.close()
 		GlobalVars.mqttLink = null
 	}

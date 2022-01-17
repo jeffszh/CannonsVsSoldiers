@@ -1,10 +1,10 @@
-import cn.jeff.game.c3s15.board.ChessBoardContent
-import cn.jeff.game.c3s15.net.GameMessage
-import cn.jeff.game.c3s15.net.NetGameState
-import com.google.gson.GsonBuilder
+//import cn.jeff.game.c3s15.board.ChessBoardContent
+//import cn.jeff.game.c3s15.net.GameMessage
+//import cn.jeff.game.c3s15.net.NetGameState
+//import com.google.gson.GsonBuilder
 
 fun main() {
-	val gson = GsonBuilder().setPrettyPrinting().create()
+/*	val gson = GsonBuilder().setPrettyPrinting().create()
 	val msg1 = GameMessage(
 		NetGameState.INVITING, "abc", "def", 345,
 		ChessBoardContent.Move(5, 6, 7, 8)
@@ -19,5 +19,5 @@ fun main() {
 	println(txt3)
 	val msg4 = gson.fromJson(txt3, GameMessage::class.java)
 	val txt4 = gson.toJson(msg4)
-	println(txt4)
+	println(txt4)*/
 }

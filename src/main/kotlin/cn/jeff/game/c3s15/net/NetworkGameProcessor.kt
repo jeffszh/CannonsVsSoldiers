@@ -1,18 +1,47 @@
 package cn.jeff.game.c3s15.net
 
-import cn.jeff.game.c3s15.GlobalVars
 import cn.jeff.game.c3s15.MainWnd
 import cn.jeff.game.c3s15.board.ChessBoardContent
-import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.MoveChessEvent
 import com.google.gson.GsonBuilder
 import tornadofx.*
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.Semaphore
-import java.util.concurrent.SynchronousQueue
-import java.util.concurrent.TimeUnit
-import kotlin.concurrent.thread
 
+object NetworkGameProcessor {
+
+	private val gson = GsonBuilder().setPrettyPrinting().create()
+	private val localChessBoard get() = find<MainWnd>().j.chessBoard
+
+	/** 收到 MQTT 消息时，从这里通知进来。 */
+	fun onMqttReceived(txtPayload: String) {
+		val msg = try {
+			gson.fromJson(txtPayload, GameMessage::class.java)
+		} catch (e: Exception) {
+			e.printStackTrace()
+			return
+		}
+		// 判断跟本地棋盘是否一致。
+		val newChessBoardContent = localChessBoard.content.clone()
+		newChessBoardContent.applyMove(msg.lastMove)
+		if (newChessBoardContent.compressToInt64() == msg.packedChessCells) {
+			// 棋盘一致，确认走棋。
+			FX.eventbus.fire(MoveChessEvent(msg.lastMove, true))
+		}
+	}
+
+	/** 本地走棋，从这里通知进来。 */
+	fun applyLocalMove(packedChessCells: Long, move: ChessBoardContent.Move) {
+		MqttDaemon.sendMsg(
+			gson.toJson(
+				GameMessage(
+					packedChessCells, move
+				)
+			)
+		)
+	}
+
+}
+
+/*
 object NetworkGameProcessor {
 
 	private val gson = GsonBuilder().setPrettyPrinting().create()
@@ -300,3 +329,4 @@ object NetworkGameProcessor {
 	}
 
 }
+*/

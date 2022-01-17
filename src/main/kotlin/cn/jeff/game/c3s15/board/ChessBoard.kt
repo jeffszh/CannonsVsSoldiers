@@ -4,7 +4,6 @@ import cn.jeff.game.c3s15.GlobalVars
 import cn.jeff.game.c3s15.brain.Brain
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.brain.calcArrowPolygonPoints
-import cn.jeff.game.c3s15.net.NetGameState
 import cn.jeff.game.c3s15.net.NetworkGameProcessor
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -207,8 +206,8 @@ class ChessBoard : Pane() {
 	fun applyMove(move: ChessBoardContent.Move, byRemote: Boolean = false) {
 		if ((GlobalVars.soldiersPlayerType.value == PlayerType.NET ||
 					GlobalVars.cannonsPlayerType.value == PlayerType.NET) &&
-			!byRemote &&
-			GlobalVars.netGameStateProperty.value != NetGameState.LOCAL_TURN
+			!byRemote && GlobalVars.mqttLink == null
+		// GlobalVars.netGameStateProperty.value != NetGameState.LOCAL_TURN
 		) {
 			return
 		}
