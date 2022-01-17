@@ -1,5 +1,6 @@
 package cn.jeff.game.c3s15.net
 
+import cn.jeff.game.c3s15.GlobalVars
 import cn.jeff.game.c3s15.MainWnd
 import cn.jeff.game.c3s15.board.ChessBoardContent
 import cn.jeff.game.c3s15.event.MoveChessEvent
@@ -30,7 +31,7 @@ object NetworkGameProcessor {
 
 	/** 本地走棋，从这里通知进来。 */
 	fun applyLocalMove(packedChessCells: Long, move: ChessBoardContent.Move) {
-		MqttDaemon.sendMsg(
+		GlobalVars.mqttLink?.sendData(
 			gson.toJson(
 				GameMessage(
 					packedChessCells, move

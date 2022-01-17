@@ -2,6 +2,7 @@ package cn.jeff.game.c3s15
 
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.MoveChessEvent
+import cn.jeff.game.c3s15.event.NetStatusChangeEvent
 import cn.jeff.game.c3s15.net.MqttDaemon
 import cn.jeff.game.c3s15.net.MqttLink
 import cn.jeff.game.c3s15.net.NetworkGameProcessor
@@ -59,7 +60,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 				}
 			}
 		})
-		j.netStatusLabel.textProperty().bind(GlobalVars.netGameStateProperty.asString())
+//		j.netStatusLabel.textProperty().bind(GlobalVars.netGameStateProperty.asString())
 
 		subscribe<MoveChessEvent> { e ->
 			j.chessBoard.applyMove(e.move, e.byRemote)
@@ -67,6 +68,12 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 //		subscribe<ReceivedMqttMsg> { e ->
 //			NetworkGameProcessor.onMqttReceived(e.msg)
 //		}
+		subscribe<NetStatusChangeEvent> {
+			j.netStatusLabel.text = if (GlobalVars.mqttLink == null)
+				"未连线"
+			else
+				"已连线"
+		}
 	}
 
 	fun btnRestartClick() {
@@ -79,8 +86,11 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		if (GlobalVars.cannonsPlayerType.value == PlayerType.NET ||
 			GlobalVars.soldiersPlayerType.value == PlayerType.NET
 		) {
+			GlobalVars.mqttLink?.close()
+			GlobalVars.mqttLink = null
 			dialog("连接方式") {
 				style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
+				alignment = Pos.CENTER
 				hbox {
 					spacing = 10.0
 					button("蓝牙") {
@@ -107,9 +117,11 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 			"正在连接网友……" to true
 		}
 		dialog(title) {
+			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
+			alignment = Pos.CENTER
 			GlobalVars.mqttLink?.close()
 			GlobalVars.mqttLink = null
-			MqttLink(initiative) {
+			val mqttLink = MqttLink(initiative) {
 				onConnect {
 					runLater {
 						this@dialog.close()
@@ -121,6 +133,8 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 					runLater {
 						this@dialog.close()
 						warning("出错：${it.message}")
+						GlobalVars.mqttLink?.close()
+						GlobalVars.mqttLink = null
 					}
 				}
 				onReceive {
@@ -130,6 +144,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
 			button("取消") {
 				action {
+					mqttLink.close()
 					close()
 				}
 			}
