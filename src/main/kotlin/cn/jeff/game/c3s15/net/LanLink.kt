@@ -1,9 +1,7 @@
 package cn.jeff.game.c3s15.net
 
-import java.net.DatagramPacket
-import java.net.DatagramSocket
-import java.net.ServerSocket
-import java.net.Socket
+import java.io.IOException
+import java.net.*
 import kotlin.concurrent.thread
 
 class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op) {
@@ -19,7 +17,6 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 
 	init {
 		workThread = thread(name = "LAN_LINK_WORK_THREAD") {
-			MqttDaemon.clearReceivingQueue()
 			try {
 				if (initiative) {
 					runInitiative()
@@ -35,30 +32,47 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 	}
 
 	private fun runInitiative() {
-		socket = bluetoothDevice.createRfcommSocketToServiceRecord(
-			UUID.fromString(GlobalVars.BLUETOOTH_LINK_UUID)
-		)
-		socket?.connect()
-
-		runConnected()
+		repeat(5) {
+			try {
+				DatagramSocket().use { udpSocket ->
+					val data = "hello".toByteArray()
+					val udpPacket = DatagramPacket(
+						data, data.size,
+						InetAddress.getByName("255.255.255.255"), UDP_PORT
+					)
+					udpSocket.broadcast = true
+					udpSocket.soTimeout = 2000
+					udpSocket.receive(udpPacket)
+					// 若成功收到回應，用對方的地址建立TCP連接。
+					socket = Socket().apply {
+						connect(udpPacket.socketAddress, 3000)
+					}
+				}
+				if (socket?.isConnected == true) {
+					return runConnected()
+				}
+			} catch (e: SocketTimeoutException) {
+				// do nothing
+			}
+		}
+		throw IOException("连接失败！")
 	}
 
 	private fun runPassive() {
 		DatagramSocket(UDP_PORT).use { udpSocket ->
 			val buffer = ByteArray(2048)
 			val udpPacket = DatagramPacket(buffer, buffer.size)
-			val recLen = udpSocket.receive(udpPacket)
+			udpSocket.receive(udpPacket)
+			// 不必理會收到什麼，隨便回應什麼都可以，目的是把自己的地址發給對方。
+			udpSocket.send(udpPacket)
 		}
 
-		serverSocket = bluetoothAdapter.listenUsingRfcommWithServiceRecord(
-			"C3S15",
-			UUID.fromString(GlobalVars.BLUETOOTH_LINK_UUID)
-		)
+		serverSocket = ServerSocket(TCP_PORT)
 		socket = serverSocket?.accept()
 
-		// 馬上可以關掉，不會影響已連接好的socket。
-		serverSocket?.close()
-		serverSocket = null
+		// TCP跟藍牙不一樣，不能關掉serverSocket，否則已建立的連接會斷開。
+		// serverSocket?.close()
+		// serverSocket = null
 
 		runConnected()
 	}

@@ -3,6 +3,8 @@ package cn.jeff.game.c3s15
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.MoveChessEvent
 import cn.jeff.game.c3s15.event.NetStatusChangeEvent
+import cn.jeff.game.c3s15.net.BaseNetLink
+import cn.jeff.game.c3s15.net.LanLink
 import cn.jeff.game.c3s15.net.MqttDaemon
 import cn.jeff.game.c3s15.net.MqttLink
 import javafx.fxml.FXMLLoader
@@ -93,12 +95,19 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 				hbox {
 					spacing = 10.0
 					button("局域网") {
-						action { }
+						action {
+							close()
+							showWaitConnectDialog { initiative, op ->
+								LanLink(initiative, op)
+							}
+						}
 					}
 					button("互联网") {
 						action {
 							close()
-							showMqttWaitConnectDialog()
+							showWaitConnectDialog { initiative, op ->
+								MqttLink(initiative, op)
+							}
 						}
 					}
 					button("取消") {
@@ -109,7 +118,9 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		}
 	}
 
-	private fun showMqttWaitConnectDialog() {
+	private fun showWaitConnectDialog(
+		netLinkCreator: (initiative: Boolean, BaseNetLink.() -> Unit) -> BaseNetLink
+	) {
 		val (title, initiative) = if (GlobalVars.cannonsPlayerType.value == PlayerType.NET) {
 			"正在等待网友连接……" to false
 		} else {
@@ -120,7 +131,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 			alignment = Pos.CENTER
 			GlobalVars.netLink?.close()
 			GlobalVars.netLink = null
-			val mqttLink = MqttLink(initiative) {
+			val link = netLinkCreator(initiative) {
 				onConnect {
 					runLater {
 						this@dialog.close()
@@ -140,7 +151,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
 			button("取消") {
 				action {
-					mqttLink.close()
+					link.close()
 					close()
 				}
 			}
