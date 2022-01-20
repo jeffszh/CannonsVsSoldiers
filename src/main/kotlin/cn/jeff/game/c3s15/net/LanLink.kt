@@ -41,11 +41,13 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 						InetAddress.getByName("255.255.255.255"), UDP_PORT
 					)
 					udpSocket.broadcast = true
+					udpSocket.send(udpPacket)
 					udpSocket.soTimeout = 2000
 					udpSocket.receive(udpPacket)
 					// 若成功收到回應，用對方的地址建立TCP連接。
 					socket = Socket().apply {
-						connect(udpPacket.socketAddress, 3000)
+						// connect(udpPacket.socketAddress, 3000)
+						connect(InetSocketAddress(udpPacket.address, TCP_PORT), 3000)
 					}
 				}
 				if (socket?.isConnected == true) {
