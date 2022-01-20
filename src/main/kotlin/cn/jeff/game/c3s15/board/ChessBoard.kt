@@ -206,7 +206,7 @@ class ChessBoard : Pane() {
 	fun applyMove(move: ChessBoardContent.Move, byRemote: Boolean = false) {
 		if ((GlobalVars.soldiersPlayerType.value == PlayerType.NET ||
 					GlobalVars.cannonsPlayerType.value == PlayerType.NET) &&
-			!byRemote && GlobalVars.mqttLink == null
+			!byRemote && GlobalVars.netLink == null
 		// GlobalVars.netGameStateProperty.value != NetGameState.LOCAL_TURN
 		) {
 			return

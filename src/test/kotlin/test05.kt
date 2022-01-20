@@ -10,9 +10,9 @@ fun main() {
 		onConnect {
 			semConnected.release()
 		}
-		onReceive {
-			println("收到数据：$it")
-		}
+//		onReceive {
+//			println("收到数据：$it")
+//		}
 		onError { e ->
 			println("=======================================================")
 			println(e.message)

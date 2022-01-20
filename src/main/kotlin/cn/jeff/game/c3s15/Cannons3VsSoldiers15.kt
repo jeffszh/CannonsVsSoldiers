@@ -21,8 +21,8 @@ class Cannons3VsSoldiers15 : App(MainWnd::class) {
 		super.stop()
 		MqttDaemon.stop()
 		// NetworkGameProcessor.stop()
-		GlobalVars.mqttLink?.close()
-		GlobalVars.mqttLink = null
+		GlobalVars.netLink?.close()
+		GlobalVars.netLink = null
 	}
 
 }

@@ -5,7 +5,6 @@ import cn.jeff.game.c3s15.event.MoveChessEvent
 import cn.jeff.game.c3s15.event.NetStatusChangeEvent
 import cn.jeff.game.c3s15.net.MqttDaemon
 import cn.jeff.game.c3s15.net.MqttLink
-import cn.jeff.game.c3s15.net.NetworkGameProcessor
 import javafx.fxml.FXMLLoader
 import javafx.geometry.Pos
 import javafx.scene.layout.BorderPane
@@ -69,7 +68,7 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 //			NetworkGameProcessor.onMqttReceived(e.msg)
 //		}
 		subscribe<NetStatusChangeEvent> {
-			j.netStatusLabel.text = if (GlobalVars.mqttLink == null)
+			j.netStatusLabel.text = if (GlobalVars.netLink == null)
 				"未连线"
 			else
 				"已连线"
@@ -86,14 +85,14 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		if (GlobalVars.cannonsPlayerType.value == PlayerType.NET ||
 			GlobalVars.soldiersPlayerType.value == PlayerType.NET
 		) {
-			GlobalVars.mqttLink?.close()
-			GlobalVars.mqttLink = null
+			GlobalVars.netLink?.close()
+			GlobalVars.netLink = null
 			dialog("连接方式") {
 				style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
 				alignment = Pos.CENTER
 				hbox {
 					spacing = 10.0
-					button("蓝牙") {
+					button("局域网") {
 						action { }
 					}
 					button("互联网") {
@@ -119,26 +118,23 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		dialog(title) {
 			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"
 			alignment = Pos.CENTER
-			GlobalVars.mqttLink?.close()
-			GlobalVars.mqttLink = null
+			GlobalVars.netLink?.close()
+			GlobalVars.netLink = null
 			val mqttLink = MqttLink(initiative) {
 				onConnect {
 					runLater {
 						this@dialog.close()
 						information("成功连接网友。")
-						GlobalVars.mqttLink = this
+						GlobalVars.netLink = this
 					}
 				}
 				onError {
 					runLater {
 						this@dialog.close()
 						warning("出错：${it.message}")
-						GlobalVars.mqttLink?.close()
-						GlobalVars.mqttLink = null
+						GlobalVars.netLink?.close()
+						GlobalVars.netLink = null
 					}
-				}
-				onReceive {
-					NetworkGameProcessor.onMqttReceived(it)
 				}
 			}
 			style = "-fx-font-family: 'Courier New'; -fx-font-size: 20;"

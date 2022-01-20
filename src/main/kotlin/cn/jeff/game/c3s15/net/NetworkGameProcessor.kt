@@ -12,8 +12,8 @@ object NetworkGameProcessor {
 	private val gson = GsonBuilder().setPrettyPrinting().create()
 	private val localChessBoard get() = find<MainWnd>().j.chessBoard
 
-	/** 收到 MQTT 消息时，从这里通知进来。 */
-	fun onMqttReceived(txtPayload: String) {
+	/** 底層連接收到消息时，从这里通知进来。 */
+	fun onDataReceived(txtPayload: String) {
 		val msg = try {
 			gson.fromJson(txtPayload, GameMessage::class.java)
 		} catch (e: Exception) {
@@ -31,7 +31,7 @@ object NetworkGameProcessor {
 
 	/** 本地走棋，从这里通知进来。 */
 	fun applyLocalMove(packedChessCells: Long, move: ChessBoardContent.Move) {
-		GlobalVars.mqttLink?.sendData(
+		GlobalVars.netLink?.sendData(
 			gson.toJson(
 				GameMessage(
 					packedChessCells, move

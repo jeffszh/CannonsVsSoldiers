@@ -2,7 +2,7 @@ package cn.jeff.game.c3s15
 
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.NetStatusChangeEvent
-import cn.jeff.game.c3s15.net.MqttLink
+import cn.jeff.game.c3s15.net.BaseNetLink
 import com.google.gson.GsonBuilder
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
@@ -55,7 +55,7 @@ object GlobalVars {
 
 //	val netGameStateProperty = SimpleObjectProperty(NetGameState.OFFLINE)
 
-	var mqttLink: MqttLink? = null
+	var netLink: BaseNetLink? = null
 		set(value) {
 			if (field != value) {
 				field = value
