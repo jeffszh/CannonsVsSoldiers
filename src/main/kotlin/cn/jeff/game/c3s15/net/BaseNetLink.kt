@@ -44,6 +44,7 @@ abstract class BaseNetLink(op: BaseNetLink.() -> Unit) : AutoCloseable {
 	protected fun doOnError(e: Exception) {
 		GlobalVars.netLink?.close()
 		GlobalVars.netLink = null
+		// e.printStackTrace()
 		onErrorFunc(e)
 	}
 

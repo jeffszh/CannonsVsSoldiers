@@ -12,6 +12,7 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 	}
 
 	private var workThread: Thread? = null
+	private var udpSocket: DatagramSocket? = null
 	private var serverSocket: ServerSocket? = null
 	private var socket: Socket? = null
 
@@ -25,6 +26,8 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 				}
 			} catch (e: InterruptedException) {
 				// do nothing
+			} catch (e: SocketException) {
+				// do nothing
 			} catch (e: Exception) {
 				doOnError(e)
 			}
@@ -35,6 +38,7 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 		repeat(5) {
 			try {
 				DatagramSocket().use { udpSocket ->
+					this.udpSocket = udpSocket
 					val data = "hello".toByteArray()
 					val udpPacket = DatagramPacket(
 						data, data.size,
@@ -62,6 +66,7 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 
 	private fun runPassive() {
 		DatagramSocket(UDP_PORT).use { udpSocket ->
+			this.udpSocket = udpSocket
 			val buffer = ByteArray(2048)
 			val udpPacket = DatagramPacket(buffer, buffer.size)
 			udpSocket.receive(udpPacket)
@@ -85,8 +90,10 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 		val buffer = ByteArray(2048)
 		do {
 			val recLen = input.read(buffer)
-			val txt = String(buffer, 0, recLen, Charsets.UTF_8)
-			doOnReceived(txt)
+			if (recLen > 0) {
+				val txt = String(buffer, 0, recLen, Charsets.UTF_8)
+				doOnReceived(txt)
+			}
 		} while (recLen > 0)
 	}
 
@@ -101,6 +108,8 @@ class LanLink(initiative: Boolean, op: BaseNetLink.() -> Unit) : BaseNetLink(op)
 		socket = null
 		serverSocket?.close()
 		serverSocket = null
+		udpSocket?.close()
+		udpSocket = null
 	}
 
 }
