@@ -32,12 +32,19 @@
 					BorderPane.alignment="CENTER"/>
 	</center>
 	<bottom>
-		<VBox alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
-			<padding>
-				<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
-			</padding>
-			<Label fx:id="statusLabel" text="Label"/>
-			<Label fx:id="netStatusLabel" text="Label"/>
-		</VBox>
+		<AnchorPane BorderPane.alignment="CENTER">
+			<VBox alignment="CENTER" spacing="10.0" AnchorPane.leftAnchor="0.0"
+				  AnchorPane.rightAnchor="0.0">
+				<padding>
+					<Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+				</padding>
+				<Label fx:id="statusLabel" text="Label"/>
+				<Label fx:id="netStatusLabel" text="Label"/>
+			</VBox>
+			<VBox alignment="CENTER" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0"
+				  AnchorPane.topAnchor="0.0">
+				<Button mnemonicParsing="false" onAction="#rulesDescription" text="规则说明"/>
+			</VBox>
+		</AnchorPane>
 	</bottom>
 </BorderPane>

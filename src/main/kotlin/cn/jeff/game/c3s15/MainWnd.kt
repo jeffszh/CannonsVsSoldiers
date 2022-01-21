@@ -239,4 +239,15 @@ class MainWnd : View(GlobalVars.appConf.mainTitle) {
 		}
 	}
 
+	fun rulesDescription() {
+		information(
+			"游戏规则", """
+				* 游戏为炮先行走子，双方轮流走，每次只能走一个子。
+				* 炮隔一个空格可以吃掉一个兵，注意是空格，中间有子不行。除了吃兵之外，也可单纯移动一格。
+				* 兵每次移动一格，兵没有吃子能力。
+				* 炮吃掉最后一个兵则炮胜利；兵挤住了炮，让所有炮无法移动则兵胜利。  
+			""".trimIndent()
+		)
+	}
+
 }

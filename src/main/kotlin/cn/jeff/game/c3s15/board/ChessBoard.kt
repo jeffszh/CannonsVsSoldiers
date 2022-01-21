@@ -24,7 +24,7 @@ class ChessBoard : Pane() {
 
 	companion object {
 		/** 边界留白 */
-		private const val borderPadding = 10.0
+		private const val borderPadding = 16.0
 	}
 
 	/** 棋盘格的尺寸 */
@@ -104,6 +104,15 @@ class ChessBoard : Pane() {
 					val d = borderPadding + i * cellSize
 					strokeLine(borderPadding, d, width - borderPadding, d)
 					strokeLine(d, borderPadding, d, height - borderPadding)
+				}
+				val letters = ('A'..'E').toList()
+				val numbers = ('1'..'5').toList()
+				for (i in 0..4) {
+					val d = borderPadding + (i + .5) * cellSize
+					fillText(letters[i].toString(), d - 4.0, 9.0)
+					fillText(letters[i].toString(), d - 4.0, height - .5)
+					fillText(numbers[i].toString(), .0, d + 5.0)
+					fillText(numbers[i].toString(), width - 10.0, d + 5.0)
 				}
 			}
 		}
