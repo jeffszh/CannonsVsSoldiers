@@ -20,7 +20,7 @@
 
 #### 下载
 若不想从源代码编译，想直接要可运行文件，
-可[点此下载](https://gitee.com/jeffszh/cannons-vs-soldiers/blob/master/target/CannonsVsSoldiers-1.0.jar)。
+可[点此下载](https://gitee.com/jeffszh/cannons-vs-soldiers/blob/master/target/CannonsVsSoldiers-1.13.jar)。
 
 
 #### 适用平台

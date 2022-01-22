@@ -6,7 +6,7 @@
 
 	<groupId>cn.jeff.game</groupId>
 	<artifactId>cannons-vs-soldiers</artifactId>
-	<version>1.10</version>
+	<version>1.13</version>
 	<packaging>jar</packaging>
 
 	<properties>
