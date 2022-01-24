@@ -5,6 +5,7 @@ import javafx.beans.property.SimpleBooleanProperty
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
 import tornadofx.*
+import java.lang.NumberFormatException
 import kotlin.math.abs
 
 /**
@@ -34,7 +35,38 @@ class ChessBoardContent {
 		}
 	}
 
-	class Move(val fromX: Int, val fromY: Int, val toX: Int, val toY: Int)
+	class Move(val fromX: Int, val fromY: Int, val toX: Int, val toY: Int) {
+
+		companion object {
+			private val regex = Regex("([A-Z])([1-5])-([A-Z])([1-5])")
+
+			fun fromString(txt: String) = Move(txt)
+
+			private fun parseMoveString(txt: String): List<Int> {
+				val matchResult = regex.matchEntire(txt)
+				matchResult ?: throw NumberFormatException("“$txt”不是合法的棋步！")
+				val matchGroupValues = matchResult.groupValues
+				return listOf(
+					matchGroupValues[1][0] - 'A',
+					matchGroupValues[2][0] - '1',
+					matchGroupValues[3][0] - 'A',
+					matchGroupValues[4][0] - '1',
+				)
+			}
+
+		}
+
+		private constructor(vararg coordinates: Int) : this(
+			coordinates[0], coordinates[1], coordinates[2], coordinates[3]
+		)
+
+		private constructor(txt: String) : this(*parseMoveString(txt).toIntArray())
+
+		override fun toString(): String {
+			return "${'A' + fromX}${'1' + fromY}-${'A' + toX}${'1' + toY}"
+		}
+
+	}
 
 	/**
 	 * 设置成开局局面。

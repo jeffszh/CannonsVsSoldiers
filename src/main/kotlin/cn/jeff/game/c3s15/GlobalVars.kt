@@ -1,5 +1,6 @@
 package cn.jeff.game.c3s15
 
+import cn.jeff.game.c3s15.board.GameRecord
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.NetStatusChangeEvent
 import cn.jeff.game.c3s15.net.BaseNetLink
@@ -62,5 +63,7 @@ object GlobalVars {
 				FX.eventbus.fire(NetStatusChangeEvent())
 			}
 		}
+
+	val gameRecord = GameRecord()
 
 }
