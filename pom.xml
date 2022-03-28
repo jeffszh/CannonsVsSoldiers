@@ -107,12 +107,6 @@
 			<artifactId>mqtt-client</artifactId>
 			<version>1.16</version>
 		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
-		<dependency>
-			<groupId>org.yaml</groupId>
-			<artifactId>snakeyaml</artifactId>
-			<version>1.30</version>
-		</dependency>
 	</dependencies>
 
 	<build>
