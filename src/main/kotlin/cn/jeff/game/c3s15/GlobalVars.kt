@@ -5,11 +5,8 @@ import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.NetStatusChangeEvent
 import cn.jeff.game.c3s15.net.BaseNetLink
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
-import com.google.gson.GsonBuilder
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
-import org.yaml.snakeyaml.DumperOptions
-import org.yaml.snakeyaml.Yaml
 import tornadofx.*
 import java.io.FileReader
 import java.io.FileWriter
@@ -17,14 +14,18 @@ import java.io.IOException
 
 object GlobalVars {
 
-	private const val confFilename = "c3s15.conf.json"
-	private val gson = GsonBuilder().setPrettyPrinting().create()
+	private const val confFilename = "c3s15.conf.yaml"
+
+	//	private val gson = GsonBuilder().setPrettyPrinting().create()
+	private val yamlMapper = YAMLMapper.builder().build()
+	private val yamlWriter = yamlMapper.writerWithDefaultPrettyPrinter()
+	private val yamlReader = yamlMapper.reader()
 	var appConf = AppConf()
 
 	fun loadConf(filename: String = confFilename) {
 		try {
 			FileReader(filename).use { reader ->
-				appConf = gson.fromJson(reader, AppConf::class.java)
+				appConf = yamlReader.readValue(reader, AppConf::class.java)
 			}
 		} catch (e: IOException) {
 			e.printStackTrace()
@@ -33,16 +34,8 @@ object GlobalVars {
 
 	fun saveConf(filename: String = confFilename) {
 		FileWriter(filename).use { writer ->
-			gson.toJson(appConf, writer)
+			yamlWriter.writeValue(writer, appConf)
 		}
-		println("----------------------------------------------------------------------")
-		val mp = YAMLMapper.builder().build()
-		println(mp.writerWithDefaultPrettyPrinter().writeValueAsString(appConf))
-		println(
-			Yaml(DumperOptions().apply { defaultFlowStyle = DumperOptions.FlowStyle.BLOCK })
-				.dump(appConf)
-		)
-		println("----------------------------------------------------------------------")
 	}
 
 //	val cannonsUseAIProperty = SimpleBooleanProperty(false)
