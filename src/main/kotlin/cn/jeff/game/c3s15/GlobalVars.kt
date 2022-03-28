@@ -4,9 +4,12 @@ import cn.jeff.game.c3s15.board.GameRecord
 import cn.jeff.game.c3s15.brain.PlayerType
 import cn.jeff.game.c3s15.event.NetStatusChangeEvent
 import cn.jeff.game.c3s15.net.BaseNetLink
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper
 import com.google.gson.GsonBuilder
 import javafx.beans.property.SimpleIntegerProperty
 import javafx.beans.property.SimpleObjectProperty
+import org.yaml.snakeyaml.DumperOptions
+import org.yaml.snakeyaml.Yaml
 import tornadofx.*
 import java.io.FileReader
 import java.io.FileWriter
@@ -32,6 +35,14 @@ object GlobalVars {
 		FileWriter(filename).use { writer ->
 			gson.toJson(appConf, writer)
 		}
+		println("----------------------------------------------------------------------")
+		val mp = YAMLMapper.builder().build()
+		println(mp.writerWithDefaultPrettyPrinter().writeValueAsString(appConf))
+		println(
+			Yaml(DumperOptions().apply { defaultFlowStyle = DumperOptions.FlowStyle.BLOCK })
+				.dump(appConf)
+		)
+		println("----------------------------------------------------------------------")
 	}
 
 //	val cannonsUseAIProperty = SimpleBooleanProperty(false)
